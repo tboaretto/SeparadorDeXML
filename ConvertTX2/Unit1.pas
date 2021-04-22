@@ -5,21 +5,16 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Xml.xmldom, Xml.XMLIntf, Xml.XMLDoc,
-  Vcl.StdCtrls;
+  Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
   TForm1 = class(TForm)
     Memo1: TMemo;
-    Button1: TButton;
     XMLDocument1: TXMLDocument;
-    Button2: TButton;
-    BtnTagValue: TButton;
     BtnText: TButton;
     Memo2: TMemo;
     BtnConverter: TButton;
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure BtnTagValueClick(Sender: TObject);
+    EdtXml: TLabeledEdit;
     procedure BtnTextClick(Sender: TObject);
     procedure BtnConverterClick(Sender: TObject);
   private
@@ -51,6 +46,7 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<infCte ') = True) then Memo2.Lines.Add('incluirCTe');
     if (Memo1.Lines.Strings[i].Contains('versao=') = True) then Memo2.Lines.Add('versao_2=3.00');
     if (Memo1.Lines.Strings[i].Contains('<cUF>') = True) then Memo2.Lines.Add('cUF_5='+RemoverTag('cUF',memo1.Lines.Strings[i]));
+
     if (Memo1.Lines.Strings[i].Contains('<cCT>') = True) then Memo2.Lines.Add('cCT_6='+RemoverTag('cCT',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CFOP>') = True) then Memo2.Lines.Add('CFOP_7='+RemoverTag('CFOP',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<natOp>') = True) then Memo2.Lines.Add('natOp_8='+RemoverTag('natOp',memo1.Lines.Strings[i]));
@@ -102,269 +98,16 @@ begin
 end;
 
 
-procedure TForm1.BtnTagValueClick(Sender: TObject);
-//var
-//Node1, Node2, Node3, Node4, Node5, Node6, Node7 : IXMLNode;
-//Nodes1,Nodes2 ,Nodes3, Nodes4, Nodes5, Nodes6 : IXMLNodeList;
-//I, V, B, C, N, M: integer;
-//g : String;
-begin
-{
-Memo1.Lines.Clear;
-
- XMLDocument1.LoadFromFile('C:\XMLs\ExemploXMLRege.xml');
- XMLDocument1.Active := True;
-
- Node1 := XMLDocument1.DocumentElement;
- I := Node1.ChildNodes.Count;
- Nodes1 := Node1.ChildNodes;
-   for I := 0 to Nodes1.Count - 1 do
-   begin
-      Node2 := Node1.ChildNodes.FindNode(Nodes1[I].NodeName);
-      V := Node2.ChildNodes.Count;
-      Memo1.Lines.Add(Nodes1[I].NodeName + '=' + (IntToStr(V)));
-      Nodes2 := Node2.ChildNodes;
-      for V := 0 to V - 1 do
-      begin
-        if (Nodes2[V].NodeName <> '#text') then
-        begin
-          Node3 := Node2.ChildNodes.FindNode(Nodes2[V].NodeName);
-
-          if (Nodes2[V].NodeName <> 'qrCodCTe') and (Nodes2[V].NodeName <> 'qrCodMDFe') then
-          begin
-            B := Node3.ChildNodes.Count;
-            Memo1.Lines.Add(Nodes2[V].NodeName);
-            Nodes3 := Node3.ChildNodes;
-
-            for B := 0 to B - 1 do
-            begin
-
-              if (Nodes3[B].NodeName <> '#text') then
-              begin
-                Node4 := Node3.ChildNodes.FindNode(Nodes3[B].NodeName);
-                C := Node4.ChildNodes.Count;
-
-                if (Node4.ChildNodes.Count > 1) or (Nodes3[B].NodeName = 'ICMS') or (Nodes3[B].NodeName = 'infDoc') or (Nodes3[B].NodeName = 'infModal') then
-                  Memo1.Lines.Add(Nodes3[B].NodeName)
-                else
-                  Memo1.Lines.Add(Nodes3[B].NodeName + '=' + Node4.ChildNodes[I].Text);
-
-                Nodes4 := Node4.ChildNodes;
-
-                for C := 0 to C - 1 do
-                begin
-                  if (Nodes4[C].NodeName <> '#text') then
-                  begin
-                    Node5 := Node4.ChildNodes.FindNode(Nodes4[C].NodeName);
-                    N := Node5.ChildNodes.Count;
-                    if (Node5.ChildNodes.Count > 1) then
-                      Memo1.Lines.Add(Nodes4[C].NodeName)
-                    else
-                      Memo1.Lines.Add(Nodes4[C].NodeName + '=' + Node5.ChildNodes[I].Text);
-                    Nodes5 := Node5.ChildNodes;
-
-                    for N := 0 to N - 1 do
-                    begin
-                      if (Nodes5[N].NodeName <> '#text') then
-                      begin
-                        Node6 := Node5.ChildNodes.FindNode(Nodes5[N].NodeName);
-                        M := Node6.ChildNodes.Count;
-                        if Node6.ChildNodes.Count > 1 then
-                          Memo1.Lines.Add(Nodes5[N].NodeName)
-                        else
-                          Memo1.Lines.Add(Nodes5[N].NodeName + '=' + Node6.ChildNodes[I].Text);
-
-                        Nodes6 := Node6.ChildNodes;
-                        for M := 0 to M - 1 do
-                        begin
-                          if (Nodes6[M].NodeName <> '#text') then
-                          begin
-                            Node7 := Node6.ChildNodes.FindNode(Nodes6[M].NodeName);
-                            Memo1.Lines.Add(Nodes6[M].NodeName + '=' + Node7.ChildNodes[I].Text)
-                          end;
-                        end;
-                      end;
-                    end;
-                  end;
-                end;
-              end;
-            end;
-          end;
-        end;
-      end;
-   end;
-   }
-end;
-
 procedure TForm1.BtnTextClick(Sender: TObject);
 begin
 Memo1.Lines.Clear;
 
-//memo1.Lines.LoadFromFile('C:\XMLs\ExemploXMLRege.xml');
-memo1.Lines.LoadFromFile('C:\XMLs\Exemplo_CTE.xml');
+//   memo1.Lines.LoadFromFile('C:\XMLs\Exemplo_CTE.xml');
+   memo1.Lines.LoadFromFile(EdtXml.Text);
 
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
-//var
-//Node1, Node2, Node3, Node4, Node5, Node6, Node7 : IXMLNode;
-//Nodes1,Nodes2 ,Nodes3, Nodes4, Nodes5, Nodes6 : IXMLNodeList;
-//I, V, B, C, N, M: integer;
-//g : String;
-begin
-{
-Memo1.Lines.Clear;
 
- XMLDocument1.LoadFromFile('C:\XMLs\ExemploXMLRege.xml');
- XMLDocument1.Active := True;
-
- Node1 := XMLDocument1.DocumentElement;
- I := Node1.ChildNodes.Count;
- Nodes1 := Node1.ChildNodes;
-   for I := 0 to Nodes1.Count - 1 do
-   begin
-      Node2 := Node1.ChildNodes.FindNode(Nodes1[I].NodeName);
-      V := Node2.ChildNodes.Count;
-      Memo1.Lines.Add(Nodes1[I].NodeName + '=' + (IntToStr(V)));
-      Nodes2 := Node2.ChildNodes;
-      for V := 0 to V - 1 do
-      begin
-        if (Nodes2[V].NodeName <> '#text') then
-        begin
-          Node3 := Node2.ChildNodes.FindNode(Nodes2[V].NodeName);
-          if (Nodes2[V].NodeName <> 'qrCodCTe') and (Nodes2[V].NodeName <> 'qrCodMDFe') then
-          begin
-            B := Node3.ChildNodes.Count;
-            Memo1.Lines.Add('   ' + Nodes2[V].NodeName);
-            Nodes3 := Node3.ChildNodes;
-            for B := 0 to B - 1 do
-            begin
-              if (Nodes3[B].NodeName <> '#text') then
-              begin
-                Node4 := Node3.ChildNodes.FindNode(Nodes3[B].NodeName);
-                C := Node4.ChildNodes.Count;
-                if (Node4.ChildNodes.Count > 1) or (Nodes3[B].NodeName = 'ICMS') or (Nodes3[B].NodeName = 'infDoc') or (Nodes3[B].NodeName = 'infModal') then
-                Memo1.Lines.Add('            ' + Nodes3[B].NodeName)
-                else
-                Memo1.Lines.Add('            ' + Nodes3[B].NodeName + '=' + Node4.ChildNodes[I].Text);
-                Nodes4 := Node4.ChildNodes;
-                for C := 0 to C - 1 do
-                begin
-                  if (Nodes4[C].NodeName <> '#text') then
-                  begin
-                    Node5 := Node4.ChildNodes.FindNode(Nodes4[C].NodeName);
-                    N := Node5.ChildNodes.Count;
-                    if (Node5.ChildNodes.Count > 1) then
-                    Memo1.Lines.Add('                    ' + Nodes4[C].NodeName)
-                    else
-                    Memo1.Lines.Add('                    ' + Nodes4[C].NodeName + '=' + Node5.ChildNodes[I].Text);
-                    Nodes5 := Node5.ChildNodes;
-                    for N := 0 to N - 1 do
-                    begin
-                      if (Nodes5[N].NodeName <> '#text') then
-                      begin
-                        Node6 := Node5.ChildNodes.FindNode(Nodes5[N].NodeName);
-                        M := Node6.ChildNodes.Count;
-                        if Node6.ChildNodes.Count > 1 then
-                        Memo1.Lines.Add('                            ' + Nodes5[N].NodeName)
-                        else
-                        Memo1.Lines.Add('                            ' + Nodes5[N].NodeName + '=' + Node6.ChildNodes[I].Text);
-                        Nodes6 := Node6.ChildNodes;
-                        for M := 0 to M - 1 do
-                        begin
-                          if (Nodes6[M].NodeName <> '#text') then
-                          begin
-                            Node7 := Node6.ChildNodes.FindNode(Nodes6[M].NodeName);
-                            Memo1.Lines.Add('                               ' + Nodes6[M].NodeName + '=' + Node7.ChildNodes[I].Text)
-                          end;
-                        end;
-                      end;
-                    end;
-                  end;
-                end;
-              end;
-            end;
-          end;
-        end;
-      end;
-   end;
-   }
-end;
-
-procedure TForm1.Button2Click(Sender: TObject);
-//var
-//Node1, Node2, Node3, Node4, Node5, Node6 : IXMLNode;
-//Nodes1,Nodes2 ,Nodes3, Nodes4, Nodes5, Nodes6 : IXMLNodeList;
-//I, V, B, C, N, M: integer;
-begin
-{
-Memo1.Lines.Clear;
-
- XMLDocument1.LoadFromFile('C:\XMLs\ExemploXMLRege.xml');
- XMLDocument1.Active := True;
-
- Node1 := XMLDocument1.DocumentElement;
- I := Node1.ChildNodes.Count;
- Nodes1 := Node1.ChildNodes;
-   for I := 0 to Nodes1.Count - 1 do
-   begin
-      Node2 := Node1.ChildNodes.FindNode(Nodes1[I].NodeName);
-      V := Node2.ChildNodes.Count;
-      Memo1.Lines.Add(Nodes1[I].NodeName + '=' + (IntToStr(V)));
-      Nodes2 := Node2.ChildNodes;
-      for V := 0 to V - 1 do
-      begin
-        if (Nodes2[V].NodeName <> '#text') then
-        begin
-          Node3 := Node2.ChildNodes.FindNode(Nodes2[V].NodeName);
-          if (Nodes2[V].NodeName <> 'qrCodCTe') and (Nodes2[V].NodeName <> 'qrCodMDFe') then
-          begin
-            B := Node3.ChildNodes.Count;
-            Memo1.Lines.Add('   ' + Nodes2[V].NodeName);
-            Nodes3 := Node3.ChildNodes;
-            for B := 0 to B - 1 do
-            begin
-              if (Nodes3[B].NodeName <> '#text') then
-              begin
-                Node4 := Node3.ChildNodes.FindNode(Nodes3[B].NodeName);
-                C := Node4.ChildNodes.Count;
-                Memo1.Lines.Add('            ' + Nodes3[B].NodeName);
-                Nodes4 := Node4.ChildNodes;
-                for C := 0 to C - 1 do
-                begin
-                  if (Nodes4[C].NodeName <> '#text') then
-                  begin
-                    Node5 := Node4.ChildNodes.FindNode(Nodes4[C].NodeName);
-                    N := Node5.ChildNodes.Count;
-                    Memo1.Lines.Add('                    ' + Nodes4[C].NodeName);
-                    Nodes5 := Node5.ChildNodes;
-                    for N := 0 to N - 1 do
-                    begin
-                      if (Nodes5[N].NodeName <> '#text') then
-                      begin
-                        Node6 := Node5.ChildNodes.FindNode(Nodes5[N].NodeName);
-                        M := Node6.ChildNodes.Count;
-                        Memo1.Lines.Add('                            ' + Nodes5[N].NodeName);
-                        Nodes6 := Node6.ChildNodes;
-                        for M := 0 to M - 1 do
-                        begin
-                          if (Nodes6[M].NodeName<> '#text') then
-                          begin
-                            Memo1.Lines.Add('                               ' + Nodes6[M].NodeName)
-                          end;
-                        end;
-                      end;
-                    end;
-                  end;
-                end;
-              end;
-            end;
-          end;
-        end;
-      end;
-   end;
-   }
-end;
 
 function TForm1.RemoverTag(tag, valor: string): string;
 var

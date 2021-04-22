@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 679
-  ClientWidth = 1242
+  ClientHeight = 406
+  ClientWidth = 897
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,71 +16,55 @@ object Form1: TForm1
   object Memo1: TMemo
     Left = 0
     Top = 0
-    Width = 553
-    Height = 679
+    Width = 313
+    Height = 406
     Align = alLeft
     Lines.Strings = (
       'Memo1')
     ScrollBars = ssVertical
     TabOrder = 0
   end
-  object Button1: TButton
-    Left = 595
-    Top = 533
-    Width = 107
-    Height = 25
-    Caption = 'Convert'
-    TabOrder = 1
-    OnClick = Button1Click
-  end
-  object Button2: TButton
-    Left = 595
-    Top = 564
-    Width = 107
-    Height = 25
-    Caption = 'TAGS'
-    TabOrder = 2
-    OnClick = Button2Click
-  end
-  object BtnTagValue: TButton
-    Left = 595
-    Top = 502
-    Width = 107
-    Height = 25
-    Caption = 'TAGS e Value'
-    TabOrder = 3
-    OnClick = BtnTagValueClick
-  end
   object BtnText: TButton
-    Left = 580
-    Top = 176
+    Left = 368
+    Top = 232
     Width = 133
     Height = 25
     Caption = 'Carregar como texto'
-    TabOrder = 4
+    TabOrder = 1
     OnClick = BtnTextClick
   end
   object Memo2: TMemo
-    Left = 752
+    Left = 575
     Top = 0
-    Width = 490
-    Height = 679
+    Width = 322
+    Height = 406
     Align = alRight
     Lines.Strings = (
       'Memo2')
-    TabOrder = 5
+    TabOrder = 2
   end
   object BtnConverter: TButton
-    Left = 593
-    Top = 207
-    Width = 107
+    Left = 368
+    Top = 279
+    Width = 133
     Height = 25
     Caption = 'Converter'
-    TabOrder = 6
+    TabOrder = 3
     OnClick = BtnConverterClick
   end
+  object EdtXml: TLabeledEdit
+    Left = 368
+    Top = 184
+    Width = 201
+    Height = 21
+    EditLabel.Width = 127
+    EditLabel.Height = 13
+    EditLabel.Caption = 'Informar o caminho do xml'
+    TabOrder = 4
+    Text = 'C:\gabriel\XMLs\Exemplo_CTE.xml'
+  end
   object XMLDocument1: TXMLDocument
-    Left = 629
+    Left = 421
     Top = 112
   end
 end
