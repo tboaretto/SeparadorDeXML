@@ -1,4 +1,4 @@
-program Project1;
+program Demo_Tecnospeed;
 
 uses
   Vcl.Forms,

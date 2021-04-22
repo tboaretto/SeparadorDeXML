@@ -88,13 +88,9 @@ begin
 
 
     if (Memo1.Lines.Strings[i].Contains('</ide>') = True) then Memo2.Lines.Add('</ide>');
-
     if (Memo1.Lines.Strings[i].Contains('<compl>') = True) then Memo2.Lines.Add('<compl>');
-
     if (Memo1.Lines.Strings[i].Contains('<xObs>') = True) then Memo2.Lines.Add('xObs_87='+RemoverTag('xObs',memo1.Lines.Strings[i]));
-
     if (Memo1.Lines.Strings[i].Contains('<ObsCont ') = True) then Memo2.Lines.Add('<ObsCont xCampo="LEI_TRANSP">');
-
     if (Memo1.Lines.Strings[i].Contains('<xTexto>') = True) then Memo2.Lines.Add('xObs_90='+RemoverTag('xTexto',memo1.Lines.Strings[i]));
 
 
