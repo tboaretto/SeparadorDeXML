@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 406
-  ClientWidth = 897
+  ClientHeight = 499
+  ClientWidth = 1062
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,12 +17,13 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 313
-    Height = 406
+    Height = 499
     Align = alLeft
     Lines.Strings = (
       'Memo1')
     ScrollBars = ssVertical
     TabOrder = 0
+    ExplicitHeight = 406
   end
   object BtnText: TButton
     Left = 368
@@ -34,14 +35,17 @@ object Form1: TForm1
     OnClick = BtnTextClick
   end
   object Memo2: TMemo
-    Left = 575
+    Left = 572
     Top = 0
-    Width = 322
-    Height = 406
+    Width = 490
+    Height = 499
     Align = alRight
     Lines.Strings = (
       'Memo2')
+    ScrollBars = ssVertical
     TabOrder = 2
+    ExplicitLeft = 575
+    ExplicitHeight = 491
   end
   object BtnConverter: TButton
     Left = 368
@@ -53,7 +57,7 @@ object Form1: TForm1
     OnClick = BtnConverterClick
   end
   object EdtXml: TLabeledEdit
-    Left = 368
+    Left = 344
     Top = 184
     Width = 201
     Height = 21
