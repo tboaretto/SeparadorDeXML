@@ -15,10 +15,12 @@ type
     Memo2: TMemo;
     BtnConverter: TButton;
     EdtXml: TLabeledEdit;
+    BtnExemplotx2: TButton;
     procedure BtnTextClick(Sender: TObject);
     procedure BtnConverterClick(Sender: TObject);
     procedure tx2Cte;
     procedure tx2MDFe;
+    procedure BtnExemplotx2Click(Sender: TObject);
   private
 
     { Private declarations }
@@ -52,6 +54,217 @@ begin
 
 end;
 
+
+procedure TForm1.BtnExemplotx2Click(Sender: TObject);
+var
+ i:integer;
+begin
+//  for i := 0 to Pred(Memo1.Lines.Count) do
+//  begin
+
+    Memo2.Lines.Clear;
+    Memo2.Lines.Add('');
+    Memo2.Lines.Add('Formato=TX2');
+
+    Memo2.Lines.Add('incluirenviCTe');
+    Memo2.Lines.Add('idLote=9996');
+    Memo2.Lines.Add('versao=3.00');
+    Memo2.Lines.Add('salvarenviCTe');
+
+  {
+
+    if (Memo1.Lines.Strings[i].Contains('<cDV>') = True) then Memo2.Lines.Add('cDV_16='+RemoverTag('cDV',memo1.Lines.Strings[i]));
+
+  }
+
+
+    Memo2.Lines.Add('');
+
+    if (Memo1.Lines.Strings[i].Contains('<infCte ') = True) then Memo2.Lines.Add('incluirCTe'); //Memo2.Lines.Add('incluirCTe');
+    if (Memo1.Lines.Strings[i].Contains('versao=') = True) then Memo2.Lines.Add('versao_2=3.00'); //Memo2.Lines.Add('versao_2=3.00');
+    if (Memo1.Lines.Strings[i].Contains('<cUF>') = True) then Memo2.Lines.Add('cUF_5='+RemoverTag('cUF',memo1.Lines.Strings[i]));  //Memo2.Lines.Add('cUF_5=43');
+    if (Memo1.Lines.Strings[i].Contains('<cCT>') = True) then Memo2.Lines.Add('cCT_6='+RemoverTag('cCT',memo1.Lines.Strings[i])); //Memo2.Lines.Add('cCT_6=00000000');
+    if (Memo1.Lines.Strings[i].Contains('<CFOP>') = True) then Memo2.Lines.Add('CFOP_7='+RemoverTag('CFOP',memo1.Lines.Strings[i])); //Memo2.Lines.Add('CFOP_7=5357');
+    if (Memo1.Lines.Strings[i].Contains('<natOp>') = True) then Memo2.Lines.Add('natOp_8='+RemoverTag('natOp',memo1.Lines.Strings[i])); //Memo2.Lines.Add('natOp_8=TRANSPORTE RODOVIARIO DE CARGAS');
+    if (Memo1.Lines.Strings[i].Contains('<mod>') = True) then Memo2.Lines.Add('mod_10='+RemoverTag('mod',memo1.Lines.Strings[i])); //Memo2.Lines.Add('mod_10=57');
+    if (Memo1.Lines.Strings[i].Contains('<serie>') = True) then Memo2.Lines.Add('serie_11='+RemoverTag('serie',memo1.Lines.Strings[i])); //Memo2.Lines.Add('serie_11=579');
+    if (Memo1.Lines.Strings[i].Contains('<nCT>') = True) then Memo2.Lines.Add('nCT_12='+RemoverTag('nCT',memo1.Lines.Strings[i])); //Memo2.Lines.Add('nCT_12=10');
+    if (Memo1.Lines.Strings[i].Contains('<dhEmi>') = True) then Memo2.Lines.Add('dhEmi_13='+RemoverTag('dhEmi',memo1.Lines.Strings[i])); //Memo2.Lines.Add('dhEmi_13=2018-05-15T08:50:00-03:00');
+    if (Memo1.Lines.Strings[i].Contains('<tpImp>') = True) then Memo2.Lines.Add('tpImp_14='+RemoverTag('tpImp',memo1.Lines.Strings[i])); //Memo2.Lines.Add('tpImp_14=1');
+    if (Memo1.Lines.Strings[i].Contains('<tpEmis>') = True) then Memo2.Lines.Add('tpEmis_15='+RemoverTag('tpEmis',memo1.Lines.Strings[i])); //Memo2.Lines.Add('tpEmis_15=1');
+    if (Memo1.Lines.Strings[i].Contains('<tpAmb>') = True) then Memo2.Lines.Add('tpAmb_17='+RemoverTag('tpAmb',memo1.Lines.Strings[i])); //Memo2.Lines.Add('tpAmb_17=2');
+    if (Memo1.Lines.Strings[i].Contains('<tpCTe>') = True) then Memo2.Lines.Add('tpCTe_18='+RemoverTag('tpCTe',memo1.Lines.Strings[i])); //Memo2.Lines.Add('tpCTe_18=0');
+    if (Memo1.Lines.Strings[i].Contains('<procEmi>') = True) then Memo2.Lines.Add('procEmi_19='+RemoverTag('tpprocEmiAmb',memo1.Lines.Strings[i])); //Memo2.Lines.Add('procEmi_19=0');
+    if (Memo1.Lines.Strings[i].Contains('<verProc>') = True) then Memo2.Lines.Add('verProc_20='+RemoverTag('verProc',memo1.Lines.Strings[i])); //Memo2.Lines.Add('verProc_20=1');
+    if (Memo1.Lines.Strings[i].Contains('<cMunEnv>') = True) then Memo2.Lines.Add('cMunEnv_672='+RemoverTag('cMunEnv',memo1.Lines.Strings[i])); //Memo2.Lines.Add('cMunEnv_672=4302105');
+    if (Memo1.Lines.Strings[i].Contains('<xMunEnv>') = True) then Memo2.Lines.Add('xMunEnv_673='+RemoverTag('xMunEnv',memo1.Lines.Strings[i])); //Memo2.Lines.Add('xMunEnv_673=BENTO GONCALVES');
+    if (Memo1.Lines.Strings[i].Contains('<UFEnv>') = True) then Memo2.Lines.Add('UFEnv_674='+RemoverTag('UFEnv',memo1.Lines.Strings[i])); //Memo2.Lines.Add('UFEnv_674=RS');
+    if (Memo1.Lines.Strings[i].Contains('<modal>') = True) then Memo2.Lines.Add('tmodal_25='+RemoverTag('modal',memo1.Lines.Strings[i])); //Memo2.Lines.Add('modal_25=01');
+    if (Memo1.Lines.Strings[i].Contains('<tpServ>') = True) then Memo2.Lines.Add('tpServ_26='+RemoverTag('tpServ',memo1.Lines.Strings[i])); //Memo2.Lines.Add('tpServ_26=0');
+
+    Memo2.Lines.Add('');
+
+    if (Memo1.Lines.Strings[i].Contains('<cMunIni>') = True) then Memo2.Lines.Add('cMunIni_27='+RemoverTag('cMunIni',memo1.Lines.Strings[i])); //Memo2.Lines.Add('cMunIni_27=4302105');
+    if (Memo1.Lines.Strings[i].Contains('<xMunIni>') = True) then Memo2.Lines.Add('xMunIni_28='+RemoverTag('xMunIni',memo1.Lines.Strings[i])); // Memo2.Lines.Add('xMunIni_28=BENTO GONCALVES');
+    if (Memo1.Lines.Strings[i].Contains('<UFIni>') = True) then Memo2.Lines.Add('UFIni_29='+RemoverTag('UFIni',memo1.Lines.Strings[i])); //Memo2.Lines.Add('UFIni_29=RS');
+    if (Memo1.Lines.Strings[i].Contains('<cMunFim>') = True) then Memo2.Lines.Add('cMunFim_30='+RemoverTag('cMunFim',memo1.Lines.Strings[i])); //Memo2.Lines.Add('cMunFim_30=4302105');
+    Memo2.Lines.Add('xMunFim_31=BENTO GONCALVES');
+    Memo2.Lines.Add('UFFim_32=RS');
+    Memo2.Lines.Add('retira_33=0');
+    Memo2.Lines.Add('toma_38=4');
+    Memo2.Lines.Add('xDetRetira_34=detalhes teste');
+    Memo2.Lines.Add('indIEToma_1406=1');
+    Memo2.Lines.Add('CNPJ_39=99999999999999');
+    Memo2.Lines.Add('IE_41=999999999');
+    Memo2.Lines.Add('xNome_42=Teste');
+    Memo2.Lines.Add('xFant_43=Teste');
+    Memo2.Lines.Add('fone_44=9999999999');
+    Memo2.Lines.Add('xLgr_46=Rua teste');
+    Memo2.Lines.Add('nro_47=10');
+    Memo2.Lines.Add('xCPL_48=Complemento Teste');
+    Memo2.Lines.Add('xBairro_49=Bairro Teste');
+    Memo2.Lines.Add('cMun_50=9999999');
+    Memo2.Lines.Add('xMun_51=Teste');
+    Memo2.Lines.Add('CEP_52=999999999');
+    Memo2.Lines.Add('UF_53=41');
+    Memo2.Lines.Add('cPais_54=1058');
+    Memo2.Lines.Add('xPais_55=BRASIL');
+    Memo2.Lines.Add('Email_601=teste@teste.com.br');
+    Memo2.Lines.Add('dhCont_602=2018-05-15T08:50:00-03:00');
+    Memo2.Lines.Add('xJust_603=Justificativa Teste');
+    Memo2.Lines.Add('xDest_64=123456');
+    Memo2.Lines.Add('xRota_65=123456');
+    Memo2.Lines.Add('xDest_64=123456');
+    Memo2.Lines.Add('xRota_65=123456');
+    Memo2.Lines.Add('xDest_64=123456');
+    Memo2.Lines.Add('xRota_65=123456');
+    Memo2.Lines.Add('CNPJ_95=99999999999999');
+    Memo2.Lines.Add('IE_96=99999999999');
+    Memo2.Lines.Add('xNome_97=Nome teste');
+    Memo2.Lines.Add('xFant_98=Nome teste');
+    Memo2.Lines.Add('xLgr_100=Rua teste');
+    Memo2.Lines.Add('nro_101=300');
+    Memo2.Lines.Add('xCpl_102=10 andar');
+    Memo2.Lines.Add('xBairro_103=BAIRRO TESTE');
+    Memo2.Lines.Add('cMun_104=4302105');
+    Memo2.Lines.Add('xMun_105=BENTO GONCALVES');
+    Memo2.Lines.Add('CEP_106=89233198');
+    Memo2.Lines.Add('UF_107=RS');
+    Memo2.Lines.Add('fone_110=1132433400');
+    Memo2.Lines.Add('CNPJ_112=08187168000160');
+    Memo2.Lines.Add('IE_114=9044016688');
+    Memo2.Lines.Add('xNome_115=CT-E EMITIDO EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL');
+    Memo2.Lines.Add('xFant_116=CT-E EMITIDO EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL');
+    Memo2.Lines.Add('fone_117=4430283749');
+    Memo2.Lines.Add('xLgr_119=RUA DUQUE DE CAXIAS S/N');
+    Memo2.Lines.Add('nro_120=0');
+    Memo2.Lines.Add('xBairro_122=PARANA');
+    Memo2.Lines.Add('cMun_123=4115200');
+    Memo2.Lines.Add('xMun_124=PARANA');
+    Memo2.Lines.Add('CEP_125=01000000');
+    Memo2.Lines.Add('UF_126=PR');
+    Memo2.Lines.Add('cPais_127=1058');
+    Memo2.Lines.Add('xPais_128=BRASIL');
+    Memo2.Lines.Add('email_604=x@tecnospeed.com.br');
+    Memo2.Lines.Add('CPF_200=22233344405');
+    Memo2.Lines.Add('IE_201=0500048665');
+    Memo2.Lines.Add('xNome_202=CT-E EMITIDO EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL');
+    Memo2.Lines.Add('xLgr_206=Praca Matriz');
+    Memo2.Lines.Add('nro_207=0');
+    Memo2.Lines.Add('xBairro_209=Centro');
+    Memo2.Lines.Add('cMun_210=4302105');
+    Memo2.Lines.Add('xMun_211=BENTO GONCALVES');
+    Memo2.Lines.Add('CEP_212=01000000');
+    Memo2.Lines.Add('UF_213=RS');
+    Memo2.Lines.Add('cPais_214=1058');
+    Memo2.Lines.Add('xPais_215=BRASIL');
+    Memo2.Lines.Add('email_608=teste.teste@teste.com.br');
+    Memo2.Lines.Add('vTPrest_228=200.00');
+    Memo2.Lines.Add('vRec_229=200.00');
+    Memo2.Lines.Add('CST_609=00');
+    Memo2.Lines.Add('vBC_610=0.01');
+    Memo2.Lines.Add('pICMS_611=7.00');
+    Memo2.Lines.Add('vICMS_612=0.01');
+    Memo2.Lines.Add('versaoModal_636=3.00');
+    Memo2.Lines.Add('vCarga_671=1000.00');
+    Memo2.Lines.Add('proPred_271=LATA');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('vBCUFFim_676=1.10');
+    Memo2.Lines.Add('pFCPUFFim_682=1.10');
+    Memo2.Lines.Add('pICMSUFFim_677=40');
+    Memo2.Lines.Add('pICMSInter_678=12.00');
+    Memo2.Lines.Add('vICMSUFFim_680=1.10');
+    Memo2.Lines.Add('vICMSUFIni_681=1.10');
+    Memo2.Lines.Add('vFCPUFFim_683=1.10');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('salvarCTe');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('incluirpass');
+    Memo2.Lines.Add('xPass_63=123456');
+    Memo2.Lines.Add('salvarpass');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('incluirpass');
+    Memo2.Lines.Add('xPass_63=123456');
+    Memo2.Lines.Add('salvarpass');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('incluirpass');
+    Memo2.Lines.Add('xPass_63=123456');
+    Memo2.Lines.Add('salvarpass');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('incluirinfOutros');
+    Memo2.Lines.Add('tpDoc_159=00');
+    Memo2.Lines.Add('nDoc_161=123456');
+    Memo2.Lines.Add('dEmi_162=2011-03-22');
+    Memo2.Lines.Add('vDocFisc_163=1.00');
+    Memo2.Lines.Add('incluirinfUnidCarga');
+    Memo2.Lines.Add('tpUnidCarga_810=1');
+    Memo2.Lines.Add('idUnidCarga_811=1');
+    Memo2.Lines.Add('salvarinfUnidCarga');
+    Memo2.Lines.Add('salvarinfOutros');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('incluirinfQ');
+    Memo2.Lines.Add('cUnid_274=00');
+    Memo2.Lines.Add('tpMed_275=m3');
+    Memo2.Lines.Add('qCarga_276=1');
+    Memo2.Lines.Add('salvarinfQ');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('IncluirRodo');
+    Memo2.Lines.Add('RNTRC_305=00000012');
+    Memo2.Lines.Add('SalvarRodo');
+
+    Memo2.Lines.Add('');
+
+    Memo2.Lines.Add('incluirOcc');
+    Memo2.Lines.Add('serie_312=1');
+    Memo2.Lines.Add('nOcc_313=1');
+    Memo2.Lines.Add('dEmi_314=2018-05-15');
+    Memo2.Lines.Add('CNPJ_316=08187168000160');
+    Memo2.Lines.Add('cInt_317=10');
+    Memo2.Lines.Add('IE_318=0500077436');
+    Memo2.Lines.Add('UF_319=PR');
+    Memo2.Lines.Add('fone_320=99999999');
+    Memo2.Lines.Add('salvarOcc');
+
+  end;
+
+
+//end;
 
 procedure TForm1.BtnTextClick(Sender: TObject);
 begin
