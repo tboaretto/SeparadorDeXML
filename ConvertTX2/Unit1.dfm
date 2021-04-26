@@ -23,7 +23,6 @@ object Form1: TForm1
       'Memo1')
     ScrollBars = ssVertical
     TabOrder = 0
-    ExplicitHeight = 406
   end
   object BtnText: TButton
     Left = 368
@@ -44,8 +43,6 @@ object Form1: TForm1
       'Memo2')
     ScrollBars = ssVertical
     TabOrder = 2
-    ExplicitLeft = 575
-    ExplicitHeight = 491
   end
   object BtnConverter: TButton
     Left = 368
@@ -66,6 +63,15 @@ object Form1: TForm1
     EditLabel.Caption = 'Informar o caminho do xml'
     TabOrder = 4
     Text = 'C:\gabriel\XMLs\Exemplo_CTE.xml'
+  end
+  object BtnExemplotx2: TButton
+    Left = 368
+    Top = 352
+    Width = 133
+    Height = 25
+    Caption = 'Exemplo tx2'
+    TabOrder = 5
+    OnClick = BtnExemplotx2Click
   end
   object XMLDocument1: TXMLDocument
     Left = 421
