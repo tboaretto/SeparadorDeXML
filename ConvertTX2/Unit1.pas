@@ -16,11 +16,13 @@ type
     BtnConverter: TButton;
     EdtXml: TLabeledEdit;
     BtnExemplotx2: TButton;
+    BtnNodexml: TButton;
     procedure BtnTextClick(Sender: TObject);
     procedure BtnConverterClick(Sender: TObject);
     procedure tx2Cte;
     procedure tx2MDFe;
     procedure BtnExemplotx2Click(Sender: TObject);
+    procedure BtnNodexmlClick(Sender: TObject);
   private
 
     { Private declarations }
@@ -263,6 +265,42 @@ begin
 
   end;
 
+
+procedure TForm1.BtnNodexmlClick(Sender: TObject);
+var
+nodeInfCTe, nodeIde, nodeemit, nodeenderEmit, toma3: IXMLNode;
+i,e: Integer;
+begin
+  Memo2.Lines.Clear;
+  XMLDocument1.LoadFromFile(EdtXml.Text);
+  XMLDocument1.Active := True;
+
+  nodeInfCTe := XMLDocument1.ChildNodes.FindNode('CTe').ChildNodes.FindNode('infCte');
+  nodeIde := nodeInfCTe.ChildNodes.FindNode('ide');
+
+  {node ide*****************************************************************************************}
+  Memo2.Lines.Add('Inicio  <ide>');
+  for i := 0 to nodeIde.ChildNodes.Count-1 do
+  begin
+    if (nodeIde.ChildNodes[i].NodeName <> 'toma3') then
+    Memo2.Lines.Add('     '+ nodeIde.ChildNodes[i].NodeName+' = '+nodeIde.ChildNodes[i].Text)
+    else
+    begin
+      Memo2.Lines.Add('    Inicio  <toma3>');
+      toma3 := nodeIde.ChildNodes.FindNode('toma3');
+      for e := 0 to toma3.ChildNodes.Count-1 do
+        Memo2.Lines.Add('          '+toma3.ChildNodes[e].NodeName+' = '+toma3.ChildNodes[e].Text);
+      Memo2.Lines.Add('    Fim  <toma3>');
+    end;
+  end;
+  Memo2.Lines.Add('Fim  </ide>');
+  {node ide*****************************************************************************************}
+
+
+
+
+
+end;
 
 //end;
 
