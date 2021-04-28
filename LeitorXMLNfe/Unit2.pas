@@ -36,7 +36,7 @@ i,e : Integer;
 begin
   Memo1.Lines.Clear;
 
-  XMLDocument1.LoadFromFile('C:\Users\sialog\Desktop\xml_nfe_1.xml');
+  XMLDocument1.LoadFromFile('C:\gabriel\XMLs\xml_nfe_1.xml');
   nodeInfNfe := XMLDocument1.ChildNodes.FindNode('nfeProc').ChildNodes.FindNode('NFe').ChildNodes.FindNode('infNFe');
   nodeIde := nodeInfNfe.ChildNodes.FindNode('ide');
   for i := 0 to nodeIde.ChildNodes.Count-1 do

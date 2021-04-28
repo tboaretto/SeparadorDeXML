@@ -25,9 +25,9 @@ object Form1: TForm1
     TabOrder = 0
   end
   object BtnText: TButton
-    Left = 368
-    Top = 232
-    Width = 133
+    Left = 344
+    Top = 152
+    Width = 201
     Height = 25
     Caption = 'Carregar como texto'
     TabOrder = 1
@@ -45,9 +45,9 @@ object Form1: TForm1
     TabOrder = 2
   end
   object BtnConverter: TButton
-    Left = 368
-    Top = 279
-    Width = 133
+    Left = 344
+    Top = 191
+    Width = 201
     Height = 25
     Caption = 'Converter'
     TabOrder = 3
@@ -55,7 +55,7 @@ object Form1: TForm1
   end
   object EdtXml: TLabeledEdit
     Left = 344
-    Top = 184
+    Top = 104
     Width = 201
     Height = 21
     EditLabel.Width = 127
@@ -65,16 +65,25 @@ object Form1: TForm1
     Text = 'C:\gabriel\XMLs\Exemplo_CTE.xml'
   end
   object BtnExemplotx2: TButton
-    Left = 368
-    Top = 352
-    Width = 133
+    Left = 344
+    Top = 264
+    Width = 201
     Height = 25
     Caption = 'Exemplo tx2'
     TabOrder = 5
     OnClick = BtnExemplotx2Click
   end
+  object BtnNodexml: TButton
+    Left = 344
+    Top = 384
+    Width = 201
+    Height = 25
+    Caption = 'Carregar por nodes do XML'
+    TabOrder = 6
+    OnClick = BtnNodexmlClick
+  end
   object XMLDocument1: TXMLDocument
     Left = 421
-    Top = 112
+    Top = 40
   end
 end
