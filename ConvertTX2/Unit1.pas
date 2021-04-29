@@ -283,14 +283,13 @@ begin
 
 
   Memo2.Lines.Clear;
-//  Memo2.Lines.Add('Formato=TX2');
+  Memo2.Lines.Add('Formato=TX2');
+  Memo2.Lines.Add('incluirenviCTe');
+  Memo2.Lines.Add('idLote=9996');
+  Memo2.Lines.Add('versao=3.00');
+  Memo2.Lines.Add('salvarenviCTe');
 
-//  Memo2.Lines.Add('incluirenviCTe');
-//  Memo2.Lines.Add('idLote=9996');
-//  Memo2.Lines.Add('versao=3.00');
-//  Memo2.Lines.Add('salvarenviCTe');
 
-{
 //  node ide*****************************************************************************************
   Memo2.Lines.Add('Inicio  <ide> incluirCTe');
   for i := 0 to nodeIde.ChildNodes.Count-1 do
@@ -388,7 +387,7 @@ begin
    Memo2.Lines.Add('Fim  </receb>');
 //  node receb*****************************************************************************************
 
-}
+
 //  node dest*****************************************************************************************
     nodedest := nodeInfCTe.ChildNodes.FindNode('dest');
     Memo2.Lines.Add('Inicio  <dest>');
@@ -479,7 +478,7 @@ procedure TForm1.BtnNodexmlMDFeClick(Sender: TObject);
 
 var
   nodeinfMDFe, nodeIde, infMunCarrega, nodeemit, enderEmit, noderodo, nodeinfANTT, nodeveicTracao,
-  nodeinfContratante    : IXMLNode ;
+  nodeinfContratante, nodeprop, , nodecondutor, veicReboque   : IXMLNode ;
   i, e: Integer;
 
 begin
@@ -495,7 +494,7 @@ begin
 //    nodeinfANTT := noderodo.ChildNodes.FindNode('infANTT');
 //    nodeveicTracao := noderodo.ChildNodes.FindNode('veicTracao');
 
-                    {
+
 //   node ide*****************************************************************************************
   Memo2.Lines.Add('Inicio  <ide> incluirMDFe');
   for i := 0 to nodeIde.ChildNodes.Count-1 do
@@ -534,58 +533,99 @@ begin
    Memo2.Lines.Add('Fim  </emit>');
 //   node emit*****************************************************************************************
 
-            }
+
     noderodo := nodeinfMDFe.ChildNodes.FindNode('infModal').ChildNodes.FindNode('rodo');
     nodeinfANTT := noderodo.ChildNodes.FindNode('infANTT');
+    nodeveicTracao := noderodo.ChildNodes.FindNode('veicTracao');
+    veicReboque := noderodo.ChildNodes.FindNode('veicReboque');
 
-    //nodeveicTracao := noderodo.ChildNodes.FindNode('veicTracao');
+
 
 
 //   node infModal*****************************************************************************************
-//   Memo2.Lines.Add('Inicio  <infModal> ');
-//   Memo2.Lines.Add('  Inicio  <rodo> ');
+   Memo2.Lines.Add('Inicio  <infModal> ');
+   Memo2.Lines.Add('  Inicio  <rodo> ');
    Memo2.Lines.Add('    Inicio  <infANTT> ');
+
    for i := 0 to nodeinfANTT.ChildNodes.Count-1 do
-   begin
-     if (nodeinfANTT.ChildNodes[i].NodeName <> 'infContratante') then
-      Memo2.Lines.Add('     '+ nodeinfANTT.ChildNodes[i].NodeName+' = '+nodeinfANTT.ChildNodes[i].Text)
-     else
-     begin
-       Memo2.Lines.Add('    Inicio  <infContratante> ');
-       nodeinfContratante := nodeinfANTT.ChildNodes.FindNode('infContratante');
-       for e := 0 to nodeinfContratante.ChildNodes.Count-1 do
-         Memo2.Lines.Add('          '+nodeinfContratante.ChildNodes[e].NodeName+' = '+nodeinfContratante.ChildNodes[e].Text);
-       Memo2.Lines.Add('    Fim  <infContratante>');
+     if not (nodeinfANTT = nil) then
+       if (nodeinfANTT.ChildNodes[i].NodeName <> 'infContratante') then
+         Memo2.Lines.Add('     '+ nodeinfANTT.ChildNodes[i].NodeName+' = '+nodeinfANTT.ChildNodes[i].Text)
+       else
+       begin
+         nodeinfContratante := nodeinfANTT.ChildNodes.FindNode('infContratante');
+         if not (nodeinfContratante = nil) then
+         repeat
+           if not (nodeinfContratante = nil) then
+           begin
+             Memo2.Lines.Add('      <infContratante>');
+             for e := 0 to nodeinfContratante.ChildNodes.Count-1 do
+                Memo2.Lines.Add('          '+nodeinfContratante.ChildNodes[e].NodeName+' = '+nodeinfContratante.ChildNodes[e].Text);
 
-     end;
-   end;
+             Memo2.Lines.Add('      </infContratante>');
+             nodeinfContratante := nodeinfContratante.NextSibling;
+           end;
+          nodeinfANTT := nodeinfANTT.NextSibling;
+         until nodeinfANTT = nil ;
+       end;
    Memo2.Lines.Add('    Fim  </infANTT> ');
-
-{
-        nodeComp := nodevPrest.ChildNodes.FindNode('Comp');
-        nodeComp.ChildNodes.First;
-        repeat
-          Memo2.Lines.Add('    Inicio  <Comp>');
-            for e := 0 to nodeComp.ChildNodes.Count-1 do
-            begin
-              Memo2.Lines.Add('          '+nodeComp.ChildNodes[e].NodeName+' = '+nodeComp.ChildNodes[e].Text);
-  //            nodeComp := nodeComp.NextSibling;
-            end;
-          Memo2.Lines.Add('    Fim  </Comp>');
-          nodeComp := nodeComp.NextSibling;
-        until nodeComp = nil;
-
-}
-
-
-
-
 //   node infModal*****************************************************************************************
+
+
+
+//   node veicTracao*****************************************************************************************
+
+  nodeveicTracao := noderodo.ChildNodes.FindNode('veicTracao');
+  Memo2.Lines.Add('Inicio  <veicTracao>');
+  for i := 0 to nodeveicTracao.ChildNodes.Count-1 do
+  begin
+    if (nodeveicTracao.ChildNodes[i].NodeName = 'prop') then
+    begin
+      Memo2.Lines.Add('    Inicio  <prop>');
+      nodeprop := nodeveicTracao.ChildNodes.FindNode('prop');
+      for e := 0 to nodeprop.ChildNodes.Count-1 do
+      Memo2.Lines.Add('          '+nodeprop.ChildNodes[e].NodeName+' = '+nodeprop.ChildNodes[e].Text);
+      Memo2.Lines.Add('    Fim  </prop>');
+    end else
+    if (nodeveicTracao.ChildNodes[i].NodeName = 'condutor') then
+    begin
+      Memo2.Lines.Add('    Inicio  <condutor>');
+      nodecondutor := nodeveicTracao.ChildNodes.FindNode('condutor');
+      for e:= 0 to nodecondutor.ChildNodes.Count-1 do
+      Memo2.Lines.Add('          '+nodecondutor.ChildNodes[e].NodeName+' = '+nodecondutor.ChildNodes[e].Text);
+      Memo2.Lines.Add('    Fim  </condutor>');
+    end else
+      Memo2.Lines.Add('     '+ nodeveicTracao.ChildNodes[i].NodeName+' = '+nodeveicTracao.ChildNodes[i].Text)
+  end;
+
+  Memo2.Lines.Add('      Fim </veicTracao>');
+  Memo2.Lines.Add('    Fim</veicReboque>');
+  Memo2.Lines.Add('  Fim</rodo>');
+  Memo2.Lines.Add('Fim</infModal>');
+
+//   node veicTracao*****************************************************************************************
+
+//   node veicTracao*****************************************************************************************
+     veicReboque := noderodo.ChildNodes.FindNode('veicReboque');
+     Memo2.Lines.Add('Inicio  <veicReboque>');
+     for i := 0 to veicReboque.ChildNodes.Count-1 do
+     begin
+       if (veicReboque.ChildNodes[i].NodeName = 'prop') then
+       begin
+         Memo2.Lines.Add('    Inicio  <prop>');
+         for e := 0 to nodeprop.ChildNodes.Count-1 do;
+         Memo2.Lines.Add('          '+nodeprop.ChildNodes[e].NodeName+' = '+nodeprop.ChildNodes[e].Text);
+         Memo2.Lines.Add('    Fim  </prop>');
+       end;
+     end;
+     Memo2.Lines.Add('Inicio  </veicReboque>');
+
+//   node veicTracao*****************************************************************************************
+
 
 
 end;
 
-//end;
 
 procedure TForm1.BtnTextClick(Sender: TObject);
 begin
