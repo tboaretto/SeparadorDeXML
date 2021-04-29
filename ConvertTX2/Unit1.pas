@@ -269,7 +269,6 @@ procedure TForm1.BtnNodexmlClick(Sender: TObject);
 var
   nodeInfCTe, nodeIde, nodeemit, noderem, nodereceb, nodedest, nodeenderEmit, nodeenderReme,
   nodeenderDest, nodeenderReceb, nodetoma3, nodecompl, nodevPrest, nodeComp: IXMLNode;
-  NodeListComp: IXMLDOMNodeList;
   i,e: Integer;
 begin
   Memo2.Lines.Clear;
@@ -289,7 +288,7 @@ begin
 //  Memo2.Lines.Add('versao=3.00');
 //  Memo2.Lines.Add('salvarenviCTe');
 
-
+{
 //  node ide*****************************************************************************************
   Memo2.Lines.Add('Inicio  <ide> incluirCTe');
   for i := 0 to nodeIde.ChildNodes.Count-1 do
@@ -387,7 +386,7 @@ begin
    Memo2.Lines.Add('Fim  </receb>');
 //  node receb*****************************************************************************************
 
-
+}
 //  node dest*****************************************************************************************
     nodedest := nodeInfCTe.ChildNodes.FindNode('dest');
     Memo2.Lines.Add('Inicio  <dest>');
@@ -408,7 +407,7 @@ begin
 //  node dest*****************************************************************************************
 
 
-{
+
 //  node vPrest*****************************************************************************************
     nodevPrest := nodeInfCTe.ChildNodes.FindNode('vPrest');
     Memo2.Lines.Add('Inicio  <vPrest>');
@@ -417,30 +416,26 @@ begin
       if (nodevPrest.ChildNodes[i].NodeName <> 'Comp') then
          Memo2.Lines.Add('     '+ nodevPrest.ChildNodes[i].NodeName+' = '+nodevPrest.ChildNodes[i].Text)
       else
+      if (nodevPrest.ChildNodes[i].NodeName = 'Comp') then
       begin
-        Memo2.Lines.Add('    Inicio  <Comp>');
-//        nodeComp := nodevPrest.ChildNodes.FindNode('Comp');
-
-//        NodeListComp := nodevPrest.ChildNodes.FindNode('Comp');
-
-        NodeListComp := XMLDocument1.ChildNodes.FindNode('CTe').ChildNodes.FindNode('infCte').ChildNodes.FindNode('vPrest').ChildNodes.FindNode('Comp');
+        nodeComp := nodevPrest.ChildNodes.FindNode('Comp');
+        nodeComp.ChildNodes.First;
         repeat
-          nodeComp := NodeListComp.nextNode;
-          if (nodeComp = nil) then
-            Break;
-//          Memo2.Lines.Add(nodeComp.baseName);
-          Memo2.Lines.Add('          '+nodeComp.ChildNodes[e].NodeName+' = '+nodeComp.ChildNodes[e].Text);
+        Memo2.Lines.Add('    Inicio  <Comp>');
           for e := 0 to nodeComp.ChildNodes.Count-1 do
-             Memo2.Lines.Add('          '+nodeenderDest.ChildNodes[e].NodeName+' = '+nodeenderDest.ChildNodes[e].Text);
-        until (nodeComp = nil);
-
-
+          begin
+            Memo2.Lines.Add('          '+nodeComp.ChildNodes[e].NodeName+' = '+nodeComp.ChildNodes[e].Text);
+//            nodeComp := nodeComp.NextSibling;
+          end;
         Memo2.Lines.Add('    Fim  </Comp>');
+        nodeComp := nodeComp.NextSibling;
+        until nodeComp = nil;
+
       end;
     end;
     Memo2.Lines.Add('Fim  </vPrest>');
 //  node vPrest*****************************************************************************************
-               }
+
 
   Memo2.Lines.Add(' ');
   Memo2.Lines.Add(' ');
