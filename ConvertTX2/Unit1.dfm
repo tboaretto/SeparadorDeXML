@@ -73,14 +73,23 @@ object Form1: TForm1
     TabOrder = 5
     OnClick = BtnExemplotx2Click
   end
-  object BtnNodexml: TButton
+  object BtnNodexmlCTE: TButton
     Left = 344
     Top = 384
     Width = 201
     Height = 25
-    Caption = 'Carregar por nodes do XML'
+    Caption = 'Carregar por nodes do XML CTE'
     TabOrder = 6
-    OnClick = BtnNodexmlClick
+    OnClick = BtnNodexmlCTEClick
+  end
+  object BtnNodexmlMDFe: TButton
+    Left = 344
+    Top = 440
+    Width = 201
+    Height = 25
+    Caption = 'Carregar por nodes do XML MDFe'
+    TabOrder = 7
+    OnClick = BtnNodexmlMDFeClick
   end
   object XMLDocument1: TXMLDocument
     Left = 421
