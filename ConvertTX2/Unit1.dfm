@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 499
-  ClientWidth = 1062
+  ClientWidth = 1182
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,7 +16,7 @@ object Form1: TForm1
   object Memo1: TMemo
     Left = 0
     Top = 0
-    Width = 313
+    Width = 161
     Height = 499
     Align = alLeft
     Lines.Strings = (
@@ -25,7 +25,7 @@ object Form1: TForm1
     TabOrder = 0
   end
   object BtnText: TButton
-    Left = 344
+    Left = 174
     Top = 152
     Width = 201
     Height = 25
@@ -34,9 +34,9 @@ object Form1: TForm1
     OnClick = BtnTextClick
   end
   object Memo2: TMemo
-    Left = 572
+    Left = 392
     Top = 0
-    Width = 490
+    Width = 790
     Height = 499
     Align = alRight
     Lines.Strings = (
@@ -45,7 +45,7 @@ object Form1: TForm1
     TabOrder = 2
   end
   object BtnConverter: TButton
-    Left = 344
+    Left = 174
     Top = 191
     Width = 201
     Height = 25
@@ -54,7 +54,7 @@ object Form1: TForm1
     OnClick = BtnConverterClick
   end
   object EdtXml: TLabeledEdit
-    Left = 344
+    Left = 174
     Top = 104
     Width = 201
     Height = 21
@@ -62,10 +62,10 @@ object Form1: TForm1
     EditLabel.Height = 13
     EditLabel.Caption = 'Informar o caminho do xml'
     TabOrder = 4
-    Text = 'C:\gabriel\XMLs\Exemplo_CTE.xml'
+    Text = 'C:\gabriel\XMLs\Exemplo_CTE_2_Normal.xml'
   end
   object BtnExemplotx2: TButton
-    Left = 344
+    Left = 174
     Top = 264
     Width = 201
     Height = 25
@@ -74,7 +74,7 @@ object Form1: TForm1
     OnClick = BtnExemplotx2Click
   end
   object BtnNodexmlCTE: TButton
-    Left = 344
+    Left = 174
     Top = 384
     Width = 201
     Height = 25
@@ -83,7 +83,7 @@ object Form1: TForm1
     OnClick = BtnNodexmlCTEClick
   end
   object BtnNodexmlMDFe: TButton
-    Left = 344
+    Left = 174
     Top = 440
     Width = 201
     Height = 25
@@ -92,7 +92,7 @@ object Form1: TForm1
     OnClick = BtnNodexmlMDFeClick
   end
   object XMLDocument1: TXMLDocument
-    Left = 421
+    Left = 251
     Top = 40
   end
 end
