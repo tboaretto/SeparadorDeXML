@@ -54,7 +54,7 @@ object Form1: TForm1
     OnClick = BtnConverterClick
   end
   object EdtXml: TLabeledEdit
-    Left = 174
+    Left = 167
     Top = 104
     Width = 201
     Height = 21
@@ -62,11 +62,11 @@ object Form1: TForm1
     EditLabel.Height = 13
     EditLabel.Caption = 'Informar o caminho do xml'
     TabOrder = 4
-    Text = 'C:\gabriel\XMLs\Exemplo_CTE_2_Normal.xml'
+    Text = 'C:\gabriel\XMLs\CTE_1.xml'
   end
   object BtnExemplotx2: TButton
     Left = 174
-    Top = 264
+    Top = 222
     Width = 201
     Height = 25
     Caption = 'Exemplo tx2'
@@ -74,8 +74,8 @@ object Form1: TForm1
     OnClick = BtnExemplotx2Click
   end
   object BtnNodexmlCTE: TButton
-    Left = 174
-    Top = 384
+    Left = 167
+    Top = 336
     Width = 201
     Height = 25
     Caption = 'Carregar por nodes do XML CTE'
@@ -83,8 +83,8 @@ object Form1: TForm1
     OnClick = BtnNodexmlCTEClick
   end
   object BtnNodexmlMDFe: TButton
-    Left = 174
-    Top = 440
+    Left = 167
+    Top = 367
     Width = 201
     Height = 25
     Caption = 'Carregar por nodes do XML MDFe'

@@ -270,9 +270,10 @@ begin
 procedure TForm1.BtnNodexmlCTEClick(Sender: TObject);
 var
   nodeInfCTe, nodeIde, nodeemit, noderem, nodereceb, nodedest, nodeenderEmit, nodeenderReme,
-  nodeenderDest, nodeenderReceb, nodetoma3, nodecompl, nodevPrest, nodeComp, nodeimp, nodeICMS00,
+  nodeenderDest, nodeenderReceb, nodetoma, nodecompl, nodevPrest, nodeComp, nodeimp, nodeICMS,
   nodeimpInfCTe, nodeinfCteComp, nodeautXML, nodeinfCTeSupl, nodeObsCont, nodeinfCTeNorm,
-  nodeinfCargaMDFe, nodeinfDocMDFe, nodeinfQMDFe, nodeinfDoc : IXMLNode;
+  nodeinfCargaMDFe, nodeinfDocMDFe, nodeinfQMDFe, nodeinfDoc, nodeinfNFeMDFe, nodeinfModal,
+  noderodo, nodeaquav,nodeenderToma : IXMLNode;
   i,e, f: Integer;
 begin
   Memo2.Lines.Clear;
@@ -291,21 +292,47 @@ begin
 //  Memo2.Lines.Add('versao=3.00');
 //  Memo2.Lines.Add('salvarenviCTe');
 
-                                          {
+
 //  node ide*****************************************************************************************
   Memo2.Lines.Add('Inicio  <ide> incluirCTe');
   for i := 0 to nodeIde.ChildNodes.Count-1 do
   begin
-    if (nodeIde.ChildNodes[i].NodeName <> 'toma3') then
-      Memo2.Lines.Add('     '+ nodeIde.ChildNodes[i].NodeName+' = '+nodeIde.ChildNodes[i].Text)
-    else
+    if (nodeIde.ChildNodes[i].NodeName = 'toma3') then
     begin
-      Memo2.Lines.Add('    Inicio  <toma3>');
-      nodetoma3 := nodeIde.ChildNodes.FindNode('toma3');
-      for e := 0 to nodetoma3.ChildNodes.Count-1 do
-        Memo2.Lines.Add('          '+nodetoma3.ChildNodes[e].NodeName+' = '+nodetoma3.ChildNodes[e].Text);
-      Memo2.Lines.Add('    Fim  <toma3>');
-    end;
+      if not (nodeIde.ChildNodes.FindNode('toma3') = nil) then
+      begin
+        Memo2.Lines.Add('    Inicio  <toma3>');
+        nodetoma := nodeIde.ChildNodes.FindNode('toma3');
+        for e := 0 to nodetoma.ChildNodes.Count-1 do
+          Memo2.Lines.Add('          '+nodetoma.ChildNodes[e].NodeName+' = '+nodetoma.ChildNodes[e].Text);
+        Memo2.Lines.Add('    Fim  <toma3>');
+      end
+    end
+    else
+    if (nodeIde.ChildNodes[i].NodeName = 'toma4') then
+    begin
+      if not (nodeIde.ChildNodes.FindNode('toma4') = nil) then
+      begin
+        Memo2.Lines.Add('    Inicio  <toma4>');
+        nodetoma := nodeIde.ChildNodes.FindNode('toma4');
+        for e := 0 to nodetoma.ChildNodes.Count-1 do
+        begin
+          if (nodetoma.ChildNodes[e].NodeName <> 'enderToma') then
+            Memo2.Lines.Add('          '+nodetoma.ChildNodes[e].NodeName+' = '+nodetoma.ChildNodes[e].Text)
+            else
+            begin
+              nodeenderToma := nodetoma.ChildNodes.FindNode('enderToma');
+              Memo2.Lines.Add('         Inicio  <enderToma>');
+              for f := 0 to nodeenderToma.ChildNodes.Count-1 do
+                Memo2.Lines.Add('               '+nodeenderToma.ChildNodes[f].NodeName+' = '+nodeenderToma.ChildNodes[f].Text);
+              Memo2.Lines.Add('         Fim  </enderToma>');
+          end;
+        end;
+        Memo2.Lines.Add('    Fim  </toma4>');
+      end;
+    end
+    else
+      Memo2.Lines.Add('     '+ nodeIde.ChildNodes[i].NodeName+' = '+nodeIde.ChildNodes[i].Text)
   end;
   Memo2.Lines.Add('Fim  </ide> SalvarCTe');
 
@@ -452,91 +479,224 @@ begin
 //  node vPrest*****************************************************************************************
 
 
-  nodeimpInfCTe := nodeinfCte.ChildNodes.FindNode('imp').ChildNodes.FindNode('ICMS');
-     nodeICMS00 := nodeinfCte.ChildNodes.FindNode('ICMS00');
-
 //  node imp********************************************************************************************
- Memo2.Lines.Add('Inicio  <imp> ');
-   Memo2.Lines.Add('  Inicio  <ICMS> ');
 
-  nodeICMS00 := nodeimpInfCTe.ChildNodes.FindNode('ICMS00');
-  Memo2.Lines.Add('Inicio  <ICMS00>');
-  for i := 0 to nodeICMS00.ChildNodes.Count-1 do
+  if not (nodeinfCte.ChildNodes.FindNode('imp') = nil) then
   begin
-    if (nodeICMS00.ChildNodes[i].NodeName <> 'ICMS00') then
-     Memo2.Lines.Add('     '+ nodeICMS00.ChildNodes[i].NodeName+' = '+nodeICMS00.ChildNodes[i].Text)
+    nodeimpInfCTe := nodeinfCte.ChildNodes.FindNode('imp').ChildNodes.FindNode('ICMS');
+    Memo2.Lines.Add('Inicio  <imp> ');
+    Memo2.Lines.Add('    Inicio  <ICMS> ');
+
+    if not (nodeimpInfCTe.ChildNodes.FindNode('ICMS00') = nil) then
+    begin
+      nodeICMS := nodeimpInfCTe.ChildNodes.FindNode('ICMS00');
+      Memo2.Lines.Add('      Inicio  <ICMS00>');
+      for i := 0 to nodeICMS.ChildNodes.Count-1 do
+      begin
+        if (nodeICMS.ChildNodes[i].NodeName <> 'ICMS00') then
+         Memo2.Lines.Add('         '+ nodeICMS.ChildNodes[i].NodeName+' = '+nodeICMS.ChildNodes[i].Text)
+        else
+      end;
+      Memo2.Lines.Add('      Inicio  </ICMS00>');
+    end
     else
+    if not (nodeimpInfCTe.ChildNodes.FindNode('ICMS20') = nil) then
+    begin
+      nodeICMS := nodeimpInfCTe.ChildNodes.FindNode('ICMS20');
+      Memo2.Lines.Add('      Inicio  <ICMS20>');
+      for i := 0 to nodeICMS.ChildNodes.Count-1 do
+      begin
+        if (nodeICMS.ChildNodes[i].NodeName <> 'ICMS20') then
+         Memo2.Lines.Add('          '+ nodeICMS.ChildNodes[i].NodeName+' = '+nodeICMS.ChildNodes[i].Text)
+        else
+      end;
+      Memo2.Lines.Add('      Inicio  </ICMS20>');
+    end
+    else
+    if not (nodeimpInfCTe.ChildNodes.FindNode('ICMS45') = nil) then
+    begin
+      nodeICMS := nodeimpInfCTe.ChildNodes.FindNode('ICMS45');
+      Memo2.Lines.Add('      Inicio  <ICMS45>');
+      for i := 0 to nodeICMS.ChildNodes.Count-1 do
+      begin
+        if (nodeICMS.ChildNodes[i].NodeName <> 'ICMS45') then
+         Memo2.Lines.Add('          '+ nodeICMS.ChildNodes[i].NodeName+' = '+nodeICMS.ChildNodes[i].Text)
+        else
+      end;
+      Memo2.Lines.Add('      Inicio  </ICMS45>');
+    end
+    else
+    if not (nodeimpInfCTe.ChildNodes.FindNode('ICMS60') = nil) then
+    begin
+      nodeICMS := nodeimpInfCTe.ChildNodes.FindNode('ICMS60');
+      Memo2.Lines.Add('      Inicio  <ICMS60>');
+      for i := 0 to nodeICMS.ChildNodes.Count-1 do
+      begin
+        if (nodeICMS.ChildNodes[i].NodeName <> 'ICMS60') then
+         Memo2.Lines.Add('          '+ nodeICMS.ChildNodes[i].NodeName+' = '+nodeICMS.ChildNodes[i].Text)
+        else
+      end;
+      Memo2.Lines.Add('      Inicio  </ICMS60>');
+    end
+    else
+    if not (nodeimpInfCTe.ChildNodes.FindNode('ICMSSN') = nil) then
+    begin
+      nodeICMS := nodeimpInfCTe.ChildNodes.FindNode('ICMSSN');
+      Memo2.Lines.Add('      Inicio  <ICMSSN>');
+      for i := 0 to nodeICMS.ChildNodes.Count-1 do
+      begin
+        if (nodeICMS.ChildNodes[i].NodeName <> 'ICMSSN') then
+         Memo2.Lines.Add('          '+ nodeICMS.ChildNodes[i].NodeName+' = '+nodeICMS.ChildNodes[i].Text)
+        else
+      end;
+      Memo2.Lines.Add('      Inicio  </ICMSSN>');
+    end
+    else
+
+    if not (nodeimpInfCTe.ChildNodes.FindNode('ICMSOutraUF') = nil) then
+    begin
+      nodeICMS := nodeimpInfCTe.ChildNodes.FindNode('ICMSOutraUF');
+      Memo2.Lines.Add('      Inicio    <ICMSOutraUF>');
+      for i := 0 to nodeICMS.ChildNodes.Count-1 do
+      begin
+        if (nodeICMS.ChildNodes[i].NodeName <> 'ICMSOutraUF') then
+         Memo2.Lines.Add('         '+ nodeICMS.ChildNodes[i].NodeName+' = '+nodeICMS.ChildNodes[i].Text)
+        else
+      end;
+      Memo2.Lines.Add('      Fim      </ICMSOutraUF>');
+    end;
+    Memo2.Lines.Add('    Fim  <ICMS> ');
+    Memo2.Lines.Add('Fim  <imp> ');
   end;
-  Memo2.Lines.Add('Inicio  </ICMS00>');
 //  node imp**************************************************************************************************
-            }
+
 //  node infCTeNorm**************************************************************************************************
+
+   if not (nodeinfCte.ChildNodes.FindNode('infCTeNorm') = nil) then
+   begin
    nodeinfCTeNorm := nodeinfCte.ChildNodes.FindNode('infCTeNorm');
-   nodeinfDoc := nodeinfCTeNorm.ChildNodes.FindNode('infDoc');
-       Memo2.Lines.Add('Inicio  <infCTeNorm>');
-       for i := 0 to nodeinfCTeNorm.ChildNodes.Count-1 do
+     Memo2.Lines.Add('Inicio  <infCTeNorm>');
+     for i := 0 to nodeinfCTeNorm.ChildNodes.Count-1 do
+     begin
+       if (nodeinfCTeNorm.ChildNodes[i].NodeName = 'infCarga') then
        begin
-         if (nodeinfCTeNorm.ChildNodes[i].NodeName <> 'infCarga') then
-           Memo2.Lines.Add('     '+ nodeinfCTeNorm.ChildNodes[i].NodeName+' = '+nodeinfCTeNorm.ChildNodes[i].Text)
-         else
-         if (nodeinfCTeNorm.ChildNodes[i].NodeName = 'infCarga') then
+         Memo2.Lines.Add('    Inicio  <infCarga>');
+         nodeinfCargaMDFe := nodeinfCTeNorm.ChildNodes.FindNode('infCarga');
+         for e := 0 to nodeinfCargaMDFe.ChildNodes.Count-1 do
          begin
-            Memo2.Lines.Add('    Inicio  <infCarga>');
-            nodeinfCargaMDFe := nodeinfCTeNorm.ChildNodes.FindNode('infCarga');
-            for e := 0 to nodeinfCargaMDFe.ChildNodes.Count-1 do
-            begin
-             if not (nodeinfCargaMDFe = nil) then
-               if (nodeinfCargaMDFe.ChildNodes[e].NodeName <> 'infQ') then
-                 Memo2.Lines.Add('          '+nodeinfCargaMDFe.ChildNodes[e].NodeName+' = '+nodeinfCargaMDFe.ChildNodes[e].Text)
-               else
-               begin
-                 nodeinfQMDFe := nodeinfCargaMDFe.ChildNodes.FindNode('infQ');
+           if not (nodeinfCargaMDFe = nil) then
+             if (nodeinfCargaMDFe.ChildNodes[e].NodeName <> 'infQ') then
+               Memo2.Lines.Add('          '+nodeinfCargaMDFe.ChildNodes[e].NodeName+' = '+nodeinfCargaMDFe.ChildNodes[e].Text)
+             else
+             begin
+               nodeinfQMDFe := nodeinfCargaMDFe.ChildNodes.FindNode('infQ');
+               if not (nodeinfQMDFe = nil) then
+               repeat
                  if not (nodeinfQMDFe = nil) then
-                 repeat
-                   if not (nodeinfQMDFe = nil) then
-                   begin
-                     Memo2.Lines.Add('    Inicio  <infQ>');
-                     for f := 0 to nodeinfQMDFe.ChildNodes.Count-1 do
-                       Memo2.Lines.Add('          '+nodeinfQMDFe.ChildNodes[f].NodeName+' = '+nodeinfQMDFe.ChildNodes[f].Text);
-
-                     Memo2.Lines.Add('     Fim </infQ>');
-                     nodeinfQMDFe := nodeinfQMDFe.NextSibling;
-                   end;
-                 until nodeinfQMDFe = nil;
-                 nodeinfCargaMDFe := nodeinfCargaMDFe.NextSibling;
-              end;
-
+                 begin
+                   Memo2.Lines.Add('         Inicio  <infQ>');
+                   for f := 0 to nodeinfQMDFe.ChildNodes.Count-1 do
+                     Memo2.Lines.Add('                '+nodeinfQMDFe.ChildNodes[f].NodeName+' = '+nodeinfQMDFe.ChildNodes[f].Text);
+                   Memo2.Lines.Add('         Fim </infQ>');
+                   nodeinfQMDFe := nodeinfQMDFe.NextSibling;
+                   if not (nodeinfCargaMDFe = nil) then
+                      nodeinfCargaMDFe := nodeinfCargaMDFe.NextSibling;
+                 end;
+                 if not (nodeinfCargaMDFe = nil) then
+                   nodeinfCargaMDFe := nodeinfCargaMDFe.NextSibling;
+               until nodeinfQMDFe = nil;
             end;
-            Memo2.Lines.Add('    Fim  </infCarga>');
-         end
-         else
-         if (nodeinfCTeNorm.ChildNodes[i].NodeName = 'infDoc') then
+          end;
+          Memo2.Lines.Add('    Fim  </infCarga>');
+       end
+       else
+       if (nodeinfCTeNorm.ChildNodes[i].NodeName = 'infDoc') then
+       begin
+         nodeinfDoc := nodeinfCTeNorm.ChildNodes.FindNode('infDoc');
+         if not (nodeinfDoc = nil) then
          begin
-            Memo2.Lines.Add('    Inicio  <infDoc>');
-
-
-            Memo2.Lines.Add('    Fim  </infDoc>');
+           Memo2.Lines.Add('    Inicio  <infDoc>');
+           for e := 0 to nodeinfDoc.ChildNodes.Count-1 do
+           begin
+             if not (nodeinfDoc = nil) then
+             begin
+             nodeinfNFeMDFe := nodeinfDoc.ChildNodes.FindNode('infNFe');
+               repeat
+                 if not (nodeinfNFeMDFe = nil) then
+                 begin
+                   for f := 0 to nodeinfNFeMDFe.ChildNodes.Count-1 do
+                   begin
+                     Memo2.Lines.Add('         Inicio  <infNFe>');
+                     Memo2.Lines.Add('               '+nodeinfNFeMDFe.ChildNodes[f].NodeName+' = '+nodeinfNFeMDFe.ChildNodes[f].Text);
+                     Memo2.Lines.Add('         Fim  </infNFe>');
+                   end;
+                   nodeinfNFeMDFe := nodeinfNFeMDFe.NextSibling;
+                 end;
+               until nodeinfNFeMDFe = nil;
+               nodeinfDoc := nodeinfDoc.NextSibling;
+             end;
+           end;
          end;
-
-
-
+         Memo2.Lines.Add('    Fim  </infDoc>');
+       end
+       else if (nodeinfCTeNorm.ChildNodes[i].NodeName = 'infModal') then
+       begin
+         if not (nodeinfCTeNorm.ChildNodes.FindNode('infModal') = nil) then
+         begin
+           nodeinfModal := nodeinfCTeNorm.ChildNodes.FindNode('infModal');
+           if not (nodeinfModal = nil) then
+           begin
+             Memo2.Lines.Add('    Inicio  <infModal>');
+             if not (nodeinfModal.ChildNodes.FindNode('rodo') = nil) then
+               begin
+               noderodo := nodeinfModal.ChildNodes.FindNode('rodo');
+               if not (noderodo = nil) then
+               begin
+                 Memo2.Lines.Add('        Inicio  <rodo>');
+                 for e := 0 to noderodo.ChildNodes.Count-1 do
+                 begin
+                   Memo2.Lines.Add('              '+noderodo.ChildNodes[e].NodeName+' = '+noderodo.ChildNodes[e].Text);
+                 end;
+                 Memo2.Lines.Add('        Fim  </rodo>');
+               end;
+             end
+             else
+             if not (nodeinfModal.ChildNodes.FindNode('aquav') = nil) then
+             begin
+               nodeaquav := nodeinfModal.ChildNodes.FindNode('aquav');
+               if not (nodeaquav = nil) then
+               begin
+                 Memo2.Lines.Add('        Inicio  <aquav>');
+                 for e := 0 to nodeaquav.ChildNodes.Count-1 do
+                 begin
+                   Memo2.Lines.Add('              '+nodeaquav.ChildNodes[e].NodeName+' = '+nodeaquav.ChildNodes[e].Text);
+                 end;
+                 Memo2.Lines.Add('        Fim  </aquav>');
+               end;
+             end;
+             Memo2.Lines.Add('    Fim  </infModal>');
+           end;
+         end;
        end;
-       Memo2.Lines.Add('    Fim  </infCTeNorm>');
-
-
+     end;
+     Memo2.Lines.Add('Fim  </infCTeNorm>');
+   end;
 //  node infCTeNorm**************************************************************************************************
 
-
+      {
 //  node infCteComp*******************************************************************************************
     nodeinfCteComp := nodeinfCte.ChildNodes.FindNode('infCteComp');
-    Memo2.Lines.Add('Inicio  <infCteComp>');
-    for i := 0 to nodeinfCteComp.ChildNodes.Count-1 do
+    if not (nodeinfCteComp = nil) then
     begin
-       if (nodeinfCteComp.ChildNodes[i].NodeName <> 'infCteComp') then
-        Memo2.Lines.Add('     '+ nodeinfCteComp.ChildNodes[i].NodeName+' = '+nodeinfCteComp.ChildNodes[i].Text)
-       else
+      Memo2.Lines.Add('Inicio  <infCteComp>');
+      for i := 0 to nodeinfCteComp.ChildNodes.Count-1 do
+      begin
+         if (nodeinfCteComp.ChildNodes[i].NodeName <> 'infCteComp') then
+          Memo2.Lines.Add('     '+ nodeinfCteComp.ChildNodes[i].NodeName+' = '+nodeinfCteComp.ChildNodes[i].Text)
+         else
+      end;
+      Memo2.Lines.Add('Fim  </infCteComp>');
     end;
-    Memo2.Lines.Add('Fim  </infCteComp>');
 //  node infCteComp*******************************************************************************************
 
 //  node autXML**********************************************************************************************
@@ -564,7 +724,7 @@ begin
     Memo2.Lines.Add('   Fim  </infCTeSupl>');
     Memo2.Lines.Add('Fim  </Cte>');
 //  node infCTeSupl*******************************************************************************************
-
+                           }
 
 
   Memo2.Lines.Add(' ');
