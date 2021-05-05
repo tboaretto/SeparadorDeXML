@@ -294,7 +294,7 @@ begin
 
 
 //  node ide*****************************************************************************************
-  Memo2.Lines.Add('Inicio  <ide> incluirCTe');
+  Memo2.Lines.Add('incluirCTe');
   for i := 0 to nodeIde.ChildNodes.Count-1 do
   begin
     if (nodeIde.ChildNodes[i].NodeName = 'toma3') then
@@ -539,6 +539,19 @@ begin
       Memo2.Lines.Add('      Inicio  </ICMS60>');
     end
     else
+    if not (nodeimpInfCTe.ChildNodes.FindNode('ICMS90') = nil) then
+    begin
+      nodeICMS := nodeimpInfCTe.ChildNodes.FindNode('ICMS90');
+      Memo2.Lines.Add('      Inicio  <ICMS90>');
+      for i := 0 to nodeICMS.ChildNodes.Count-1 do
+      begin
+        if (nodeICMS.ChildNodes[i].NodeName <> 'ICMS90') then
+         Memo2.Lines.Add('          '+ nodeICMS.ChildNodes[i].NodeName+' = '+nodeICMS.ChildNodes[i].Text)
+        else
+      end;
+      Memo2.Lines.Add('      Inicio  </ICMS90>');
+    end
+    else
     if not (nodeimpInfCTe.ChildNodes.FindNode('ICMSSN') = nil) then
     begin
       nodeICMS := nodeimpInfCTe.ChildNodes.FindNode('ICMSSN');
@@ -683,7 +696,7 @@ begin
    end;
 //  node infCTeNorm**************************************************************************************************
 
-      {
+
 //  node infCteComp*******************************************************************************************
     nodeinfCteComp := nodeinfCte.ChildNodes.FindNode('infCteComp');
     if not (nodeinfCteComp = nil) then
@@ -724,7 +737,7 @@ begin
     Memo2.Lines.Add('   Fim  </infCTeSupl>');
     Memo2.Lines.Add('Fim  </Cte>');
 //  node infCTeSupl*******************************************************************************************
-                           }
+
 
 
   Memo2.Lines.Add(' ');
@@ -774,7 +787,7 @@ var
 begin
   Memo2.Lines.Clear;
 //  XMLDocument1.LoadFromFile(EdtXml.Text);
-  XMLDocument1.LoadFromFile('C:\gabriel\XMLs\Exemplo_MDFe.xml');
+  XMLDocument1.LoadFromFile('C:\gabriel\XMLs\Exemplo_MDFe_Aqua.xml');
   XMLDocument1.Active := True;
 
   nodeinfMDFe := XMLDocument1.ChildNodes.FindNode('MDFe').ChildNodes.FindNode('infMDFe');
@@ -783,22 +796,30 @@ begin
 
 //   node ide*****************************************************************************************
   Memo2.Lines.Add('Inicio  <ide> incluirMDFe');
-  for i := 0 to nodeIdeMDFe.ChildNodes.Count-1 do
-  begin
-    if (nodeIdeMDFe.ChildNodes[i].NodeName <> 'infMunCarrega') then
-     Memo2.Lines.Add('     '+ nodeIdeMDFe.ChildNodes[i].NodeName+' = '+nodeIdeMDFe.ChildNodes[i].Text)
-    else
-    begin
-      Memo2.Lines.Add('    Inicio  <infMunCarrega>');
-      infMunCarregaMDFe := nodeIdeMDFe.ChildNodes.FindNode('infMunCarrega');
-      for e := 0 to infMunCarregaMDFe.ChildNodes.Count-1 do
-      Memo2.Lines.Add('          '+infMunCarregaMDFe.ChildNodes[e].NodeName+' = '+infMunCarregaMDFe.ChildNodes[e].Text);
-      Memo2.Lines.Add('    Fim  <infMunCarrega>');
-    end;
-  end;
-  Memo2.Lines.Add('Fim  </ide> SalvarMDFe');
-//   node ide*****************************************************************************************
+   for i := 0 to nodeIdeMDFe.ChildNodes.Count-1 do
+     if not (nodeIdeMDFe = nil) then
+       if (nodeIdeMDFe.ChildNodes[i].NodeName <> 'infMunCarrega') then
+         Memo2.Lines.Add('     '+ nodeIdeMDFe.ChildNodes[i].NodeName+' = '+nodeIdeMDFe.ChildNodes[i].Text)
+       else
+       begin
+         infMunCarregaMDFe := nodeIdeMDFe.ChildNodes.FindNode('infMunCarrega');
+          if not (infMunCarregaMDFe = nil) then
+         repeat
+           if not (infMunCarregaMDFe = nil) then
+           begin
+              Memo2.Lines.Add('      <infMunCarrega>');
+              for e := 0 to infMunCarregaMDFe.ChildNodes.Count-1 do
+                 Memo2.Lines.Add('          '+infMunCarregaMDFe.ChildNodes[e].NodeName+' = '+infMunCarregaMDFe.ChildNodes[e].Text);
 
+              Memo2.Lines.Add('      </infMunCarrega>');
+              infMunCarregaMDFe := infMunCarregaMDFe.NextSibling;
+           end;
+//          nodeIdeMDFe := nodeIdeMDFe.NextSibling;
+         until infMunCarregaMDFe = nil ;
+       end;
+   Memo2.Lines.Add('    Fim  <ide> SalvarMDFe');
+//   node ide*****************************************************************************************
+                                 {
 
 //   node emit*****************************************************************************************
    nodeemitMDFe := nodeinfMDFe.ChildNodes.FindNode('emit');
@@ -1012,6 +1033,7 @@ begin
     Memo2.Lines.Add('  Fim  </infMDFeSupl>');
     Memo2.Lines.Add('Fim  </MDFe>');
 //   node infMDFeSupl**********************************************************************************************
+                                                        }
 end;
 procedure TForm1.BtnTextClick(Sender: TObject);
 begin
@@ -1091,6 +1113,7 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<xTexto>') = True) then Memo2.Lines.Add('xObs_90='+RemoverTag('xTexto',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<xTexto>') = True) then Memo2.Lines.Add('xTexto='+RemoverTag('xTexto',memo1.Lines.Strings[i]));
 
+    // emitente
     if (Memo1.Lines.Strings[i].Contains('<emit>') = True) then Memo2.Lines.Add('emit='+RemoverTag('emit',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CNPJ>') = True) then Memo2.Lines.Add('CNPJ_95='+RemoverTag('CNPJ',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<IE>') = True) then Memo2.Lines.Add('IE_96='+RemoverTag('IE',memo1.Lines.Strings[i]));
@@ -1106,6 +1129,8 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<CEP>') = True) then Memo2.Lines.Add('CEP_106='+RemoverTag('CEP',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<UF>') = True) then Memo2.Lines.Add('UF_107='+RemoverTag('UF',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<fone>') = True) then Memo2.Lines.Add('fone_110='+RemoverTag('fone',memo1.Lines.Strings[i]));
+
+    //remetente
     if (Memo1.Lines.Strings[i].Contains('<rem>') = True) then Memo2.Lines.Add('rem='+RemoverTag('rem',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CNPJ>') = True) then Memo2.Lines.Add('CNPJ_112='+RemoverTag('CNPJ',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CPF>') = True) then Memo2.Lines.Add('CPF_113='+RemoverTag('CPF',memo1.Lines.Strings[i]));
@@ -1125,6 +1150,8 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<cPais>') = True) then Memo2.Lines.Add('cPais_127='+RemoverTag('cPais',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<xPais>') = True) then Memo2.Lines.Add('xPais_128='+RemoverTag('xPais',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<email>') = True) then Memo2.Lines.Add('email_604='+RemoverTag('email',memo1.Lines.Strings[i]));
+
+    //local coleta
     if (Memo1.Lines.Strings[i].Contains('<locColeta>') = True) then Memo2.Lines.Add('locColeta='+RemoverTag('locColeta',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CNPJ>') = True) then Memo2.Lines.Add('CNPJ_165='+RemoverTag('CNPJ',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CPF>') = True) then Memo2.Lines.Add('CPF_166='+RemoverTag('CPF',memo1.Lines.Strings[i]));
@@ -1136,6 +1163,8 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<cMun>') = True) then Memo2.Lines.Add('cMun_175='+RemoverTag('cMun',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<xMun>') = True) then Memo2.Lines.Add('xMun_176='+RemoverTag('xMun',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<UF>') = True) then Memo2.Lines.Add('UF_178='+RemoverTag('UF',memo1.Lines.Strings[i]));
+
+    // expedidor
     if (Memo1.Lines.Strings[i].Contains('<exped>') = True) then Memo2.Lines.Add('exped='+RemoverTag('exped',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CNPJ>') = True) then Memo2.Lines.Add('CNPJ_182='+RemoverTag('CNPJ',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CPF>') = True) then Memo2.Lines.Add('CPF_183='+RemoverTag('CPF',memo1.Lines.Strings[i]));
@@ -1154,6 +1183,8 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<cPais>') = True) then Memo2.Lines.Add('cPais_196='+RemoverTag('cPais',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<xPais>') = True) then Memo2.Lines.Add('xPais_197='+RemoverTag('xPais',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<email>') = True) then Memo2.Lines.Add('email_607='+RemoverTag('email',memo1.Lines.Strings[i]));
+
+    // recebedor
     if (Memo1.Lines.Strings[i].Contains('<receb>') = True) then Memo2.Lines.Add('receb='+RemoverTag('receb',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CNPJ>') = True) then Memo2.Lines.Add('CNPJ_199='+RemoverTag('CNPJ',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CPF>') = True) then Memo2.Lines.Add('CPF_200='+RemoverTag('CPF',memo1.Lines.Strings[i]));
@@ -1172,6 +1203,9 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<cPais>') = True) then Memo2.Lines.Add('cPais_214='+RemoverTag('cPais',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<xPais>') = True) then Memo2.Lines.Add('xPais_215='+RemoverTag('xPais',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<email>') = True) then Memo2.Lines.Add('email_608='+RemoverTag('email',memo1.Lines.Strings[i]));
+
+
+    //dest
     if (Memo1.Lines.Strings[i].Contains('<dest>') = True) then Memo2.Lines.Add('dest='+RemoverTag('dest',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CNPJ>') = True) then Memo2.Lines.Add('CNPJ='+RemoverTag('CNPJ',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CPF>') = True) then Memo2.Lines.Add('CPF='+RemoverTag('CPF',memo1.Lines.Strings[i]));
@@ -1191,6 +1225,8 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<cPais>') = True) then Memo2.Lines.Add('cPais='+RemoverTag('cPais',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<xPais>') = True) then Memo2.Lines.Add('xPais='+RemoverTag('xPais',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<email>') = True) then Memo2.Lines.Add('email='+RemoverTag('email',memo1.Lines.Strings[i]));
+
+    // local entrega
     if (Memo1.Lines.Strings[i].Contains('<locEnt>') = True) then Memo2.Lines.Add('locEnt='+RemoverTag('locEnt',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CNPJ>') = True) then Memo2.Lines.Add('CNPJ='+RemoverTag('CNPJ',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<CPF>') = True) then Memo2.Lines.Add('CPF='+RemoverTag('CPF',memo1.Lines.Strings[i]));
@@ -1205,6 +1241,8 @@ begin
     if (Memo1.Lines.Strings[i].Contains('<vPrest>') = True) then Memo2.Lines.Add('vPrest='+RemoverTag('vPrest',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<vTPrest>') = True) then Memo2.Lines.Add('vTPrest_228='+RemoverTag('vTPrest',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<vRec>') = True) then Memo2.Lines.Add('vRec_229='+RemoverTag('vRec',memo1.Lines.Strings[i]));
+
+    // Comp
     if (Memo1.Lines.Strings[i].Contains('<Comp>') = True) then Memo2.Lines.Add('Comp='+RemoverTag('Comp',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<xNome>') = True) then Memo2.Lines.Add('xNome='+RemoverTag('xNome',memo1.Lines.Strings[i]));
     if (Memo1.Lines.Strings[i].Contains('<vComp>') = True) then Memo2.Lines.Add('vComp='+RemoverTag('vComp',memo1.Lines.Strings[i]));
