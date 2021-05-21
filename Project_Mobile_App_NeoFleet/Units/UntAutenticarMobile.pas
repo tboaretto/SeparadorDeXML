@@ -19,8 +19,11 @@ type
     TsAutenticar: TTabSheet;
     btnAutenticar: TButton;
     EdtStatusResponse: TEdit;
-    MemoToken: TMemo;
+    mm1: TMemo;
+    BtnCarregar: TButton;
+    EdtLoad: TEdit;
     procedure btnAutenticarClick(Sender: TObject);
+    procedure BtnCarregarClick(Sender: TObject);
   private
     procedure CarregarRest;
     { Private declarations }
@@ -49,28 +52,32 @@ begin
     RESTRequestMobile.Resource := '/api/v1/import_edocs';
 
 
-//    RESTRequestMobile.Params.AddItem('subdomain','uplog', pkGETorPOST);
-
-//    RESTRequestMobile.Params.AddHeader('Authorization', 'Bearer ' + '670da548-03fc-45d3-ad24-24b6dc021aad');
-    RESTRequestMobile.Params.AddHeader('Authorization', 'Bearer ' + '670da548-03fc-45d3-ad24-24b6dc021aad');
-
-//    RESTRequestMobile.Params.ParameterByName('Authorization').Options := [poDoNotEncode];
+    RESTRequestMobile.Params.AddHeader('Authorization', 'Bearer ' + '3acbb786-1204-4e38-8dbc-2784efe337a3');
+    RESTRequestMobile.Params.AddHeader('subdomain', 'logtech');
+    RESTRequestMobile.Params.AddHeader('Content-Type', 'application/json');
 
 
     RESTRequestMobile.Params.Add;
     RESTRequestMobile.Params[1].ContentType := ctAPPLICATION_JSON;
     RESTRequestMobile.Params[1].Kind := pkREQUESTBODY;
-
+    RESTRequestMobile.Params[1].Value := mm1.Text;
+//    RESTRequestMobile.Accept := 'text/xml';
+//    RESTRequestMobile.Accept := 'application/json';
     RESTRequestMobile.Execute;
 
 
     EdtStatusResponse.Text :=  IntToStr(RESTRequestMobile.Response.StatusCode) + ' - ' + RESTRequestMobile.Response.StatusText;
-    MemoToken.text :=  RESTResponseMobile.Content;
+//    MemoToken.text :=  RESTResponseMobile.Content;
 //    MemoToken.text :=  RESTResponseMobile.Content +  RESTRequestMobile.Resource
 
 
   finally
   end;
+end;
+
+procedure TForm1.BtnCarregarClick(Sender: TObject);
+begin
+   mm1.Lines.LoadFromFile(EdtLoad.Text);
 end;
 
 procedure TForm1.CarregarRest;
@@ -87,19 +94,25 @@ begin
     RESTClientMobile.Accept := 'application/json;q=0.9,text/plain;q=0.9,text/html';
     RESTClientMobile.ContentType := 'application/json';
 
+//    RESTClientMobile.ContentType := 'application/x-www-form-urlencoded';
+
+
+//    Content-Type:
+
     RESTClientMobile.AcceptCharset := 'UTF-8';
     RESTClientMobile.FallbackCharsetEncoding := 'UTF-8';
     RESTClientMobile.BaseURL := 'edocs.neofleet.app';
 
     RESTRequestMobile.Accept :=  'application/json;q=0.9,text/plain;q=0.9,text/html';
     RESTRequestMobile.AcceptCharset := 'UTF-8';
-
     RESTRequestMobile.Client :=  RESTClientMobile;
     RESTRequestMobile.Timeout := 3000;
+
 
     RESTResponseMobile := TRESTResponse.Create(nil);
     RESTRequestMobile.Response := RESTResponseMobile;
     RESTResponseMobile.ContentType := 'application/json';
+//    RESTResponseMobile.ContentType := 'application/x-www-form-urlencoded';
   finally
 
   end;
