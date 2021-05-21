@@ -28,7 +28,7 @@ object Form1: TForm1
         Top = 5
         Width = 110
         Height = 25
-        Caption = 'Autenticar'
+        Caption = 'Enviar'
         TabOrder = 0
         OnClick = btnAutenticarClick
       end
@@ -37,21 +37,38 @@ object Form1: TForm1
         Top = 7
         Width = 735
         Height = 21
-        Enabled = False
         ReadOnly = True
         TabOrder = 1
         Text = 'Status Response'
       end
-      object MemoToken: TMemo
+      object mm1: TMemo
         Left = 16
-        Top = 36
+        Top = 80
         Width = 851
-        Height = 429
-        Alignment = taCenter
+        Height = 385
         Lines.Strings = (
           'Memo1')
         ScrollBars = ssBoth
         TabOrder = 2
+      end
+      object BtnCarregar: TButton
+        Left = 16
+        Top = 48
+        Width = 110
+        Height = 25
+        Caption = 'Carregar'
+        TabOrder = 3
+        OnClick = BtnCarregarClick
+      end
+      object EdtLoad: TEdit
+        Left = 132
+        Top = 52
+        Width = 735
+        Height = 21
+        TabOrder = 4
+        Text = 
+          'C:\github\pessoal\Project_Mobile_App_NeoFleet\Exemplos_Json\Viag' +
+          'em_3.json'
       end
     end
   end
