@@ -56,48 +56,38 @@ begin
     RESTRequestMobile.Method := TRESTRequestMethod.rmPOST;
     RESTRequestMobile.Resource := '/api/v1/import_edocs';
 
-//    v1 := ContentTypeFromString('application/json');
-//    RESTRequestMobile.Accept := 'text/xml';
-//    RESTRequestMobile.Accept := 'application/json';
-    RESTRequestMobile.Params.AddHeader('Authorization', 'Bearer ' + LbTxtToken.Text);
-    RESTRequestMobile.Params.AddHeader('subdomain',TbTxtSubDomain.Text );
-//    RESTRequestMobile.Params.AddHeader('Content-Type', LbTxtContentType.Text);
-    RESTRequestMobile.Params.AddHeader('Content-Type', 'application/json');
+//    RESTRequestMobile.Params.AddHeader('Authorization', 'Bearer ' + LbTxtToken.Text);
+//    RESTRequestMobile.Params.ParameterByName('Authorization').Options := [poDoNotEncode];
 
-
-//    RESTRequestMobile.Params.ParameterByName('Content-Type').Options := [poDoNotEncode];
-//    RESTRequestMobile.AddParameter('Content-Type', 'application/json',  pkHTTPHEADER, [poDoNotEncode]);
-//    RESTRequestMobile.AddParameter('Content-Type', 'application/json', [poDoNotEncode]);
-
-//    RESTRequestMobile.AddParameter('Content-Type', 'application/json',TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-//    RESTRequestMobile.AddParameter('Content-Type', 'application/json',TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-
-
-//    RESTRequestMobile.Params.AddItem('Authorization','Bearer ' + LbTxtToken.Text, pkHTTPHEADER) ;
-//    RESTRequestMobile.Params.AddItem('subdomain',  TbTxtSubDomain.Text, pkHTTPHEADER) ;
-//    RESTRequestMobile.Params.AddItem('Content-Type', 'application/json', pkHTTPHEADER , [poDoNotEncode]) ;
-//    RESTRequestMobile.Params.AddItem('Content-Type', 'application/json', pkHTTPHEADER ) ;
-//    RESTRequestMobile.Params.AddItem('Content-Type', 'application/json; charset=utf-8', pkHTTPHEADER ) ;
-//    RESTRequestMobile.Params.AddItem('Content-Type', 'application/json; charset=utf-8', pkHTTPHEADER, [poDoNotEncode] ) ;
-//    RESTRequestMobile.Params.AddItem('Content-Type', 'application/json', ctNone, pkHTTPHEADER, [poDoNotEncode] ) ;
-//    RESTRequestMobile.AddParameter('Content-Type', 'application/json',TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
-
-//    RESTRequestMobile.AddAuthParameter('Content-Type', 'application/json',TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
-
+//    RESTRequestMobile.Params.AddHeader('subdomain',TbTxtSubDomain.Text );
 
 
     RESTRequestMobile.Params.Add;
+    RESTRequestMobile.Params[0].ContentType := ctAPPLICATION_JSON;
+    RESTRequestMobile.Params[0].Kind := pkHTTPHEADER;
+    RESTRequestMobile.Params[0].name := 'Authorization';
+    RESTRequestMobile.Params[0].Options := [poDoNotEncode];
+    RESTRequestMobile.Params[0].value := 'Bearer ' + LbTxtToken.Text;
 
+
+    RESTRequestMobile.Params.Add;
+    //    RESTRequestMobile.Params.AddHeader('subdomain',TbTxtSubDomain.Text );
     RESTRequestMobile.Params[1].ContentType := ctAPPLICATION_JSON;
-    RESTRequestMobile.Params[1].Kind := pkREQUESTBODY;
-    RESTRequestMobile.Params[1].Value := mm1.Text;
+    RESTRequestMobile.Params[1].Kind := pkHTTPHEADER;
+    RESTRequestMobile.Params[1].name := 'subdomain';
+//    RESTRequestMobile.Params[1].Options := [poDoNotEncode];
+    RESTRequestMobile.Params[1].value := TbTxtSubDomain.Text;
 
-
+    RESTRequestMobile.Params.Add;
     RESTRequestMobile.Params[2].ContentType := ctAPPLICATION_JSON;
     RESTRequestMobile.Params[2].Kind := pkHTTPHEADER;
     RESTRequestMobile.Params[2].name := 'Content-Type';
-//    RESTRequestMobile.Params[2].Options := [poDoNotEncode];
     RESTRequestMobile.Params[2].value := 'application/json';
+
+    RESTRequestMobile.Params.Add;
+    RESTRequestMobile.Params[3].ContentType := ctAPPLICATION_JSON;
+    RESTRequestMobile.Params[3].Kind := pkREQUESTBODY;
+    RESTRequestMobile.Params[3].Value := mm1.Text;
 
 
     RESTRequestMobile.Execute;
