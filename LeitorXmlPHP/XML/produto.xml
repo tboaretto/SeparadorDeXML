@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <vendas>
+    <produto>
+	<codigo> 1 </codigo>
+	<nome> produto 1 </nome>
+	<valor> 40.66 </valor>
+    </produto>
+    <produto>
+	<codigo> 2 </codigo>
+	<nome> produto a2 </nome>
+	<valor> 500 </valor>
+    </produto>
+    <produto>
+	<codigo> 5 </codigo>
+	<nome> produto b5 </nome>
+	<valor> 1000 </valor>
+    </produto>
+    <produto>
+	<codigo> 10 </codigo>
+	<nome> produto 10 </nome>
+	<valor> 100 </valor>
+    </produto>
+    
+    
+  </vendas>  
+</root>
