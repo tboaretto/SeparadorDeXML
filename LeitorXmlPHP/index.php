@@ -1,7 +1,6 @@
 
-
 <html>
-    <head>
+  <head>
         <meta charset=UTF-8">
         <title> Leitor de xml via php </title>
     </head>
@@ -18,7 +17,6 @@
                   echo "-------------<br>";
                }
           }
-          
         ?>
      </body>
 </html>
