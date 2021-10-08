@@ -442,9 +442,9 @@ end;
 procedure TForm1.BtnParametrosClick(Sender: TObject);
 begin
   Edtgrant_type.Text := 'password'      ;   //'grant_type',, pkGETorPOST).ToString ;
-  Edtusername.Text   := ''          ;   //'username'  ,, pkGETorPOST).ToString ;
-  Edtpassword.Text   := '';   //'password'  ,, pkGETorPOST).ToString ;
-  Edtpartner.Text    := '';   //'partner'   ,, pkGETorPOST).ToString ;
+  Edtusername.Text   := ''              ;   //'username '  ,, pkGETorPOST).ToString ;
+  Edtpassword.Text   := ''              ;   //'password '  ,, pkGETorPOST).ToString ;
+  Edtpartner.Text    := ''              ;   //'partner '   ,, pkGETorPOST).ToString ;
   // OBS: Os dados de acesso estão em um txt com o Tiago
   // D:\GoogleDrive\Tboaretto_Sialog_com_br\Pessoal\Dados_Integracao_Repom.txt
 

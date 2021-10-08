@@ -42,3 +42,4 @@ tmp/
 
 # Binaries
 bin/
+/LeitorXmlPHP/nbproject/private/
