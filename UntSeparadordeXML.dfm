@@ -42,7 +42,7 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
       EditLabel.Height = 13
       EditLabel.Caption = 'Caminho de origem do XML'
       TabOrder = 1
-      Text = 'D:\github\pessoal\SeparadorDeXML\tmp'
+      Text = 'D:\github\pessoal\tmp'
     end
     object EdtDestinoXML: TLabeledEdit
       Left = 128
@@ -53,7 +53,7 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
       EditLabel.Height = 13
       EditLabel.Caption = 'Caminho de destino do XML'
       TabOrder = 2
-      Text = 'D:\github\pessoal\SeparadorDeXML\XML'
+      Text = 'D:\github\pessoal\XML'
     end
     object BtnOrigemXML: TButton
       Left = 32
