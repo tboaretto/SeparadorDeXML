@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "envelopes":
+  {
+    "nfeDistDFeInteresse": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c29hcDEyOkVudmVsb3BlIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiIHhtbG5zOnhzZD0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEiIHhtbG5zOnNvYXAxMj0iaHR0cDovL3d3dy53My5vcmcvMjAwMy8wNS9zb2FwLWVudmVsb3BlIj48c29hcDEyOkJvZHk+PG5mZURpc3RERmVJbnRlcmVzc2UgeG1sbnM9Imh0dHA6Ly93d3cucG9ydGFsZmlzY2FsLmluZi5ici9uZmUvd3NkbC9ORmVEaXN0cmlidWljYW9ERmUiPjxuZmVEYWRvc01zZz48ZGlzdERGZUludCB2ZXJzYW89IjEuMDAiIHhtbG5zPSJodHRwOi8vd3d3LnBvcnRhbGZpc2NhbC5pbmYuYnIvbmZlIj48dHBBbWI+MTwvdHBBbWI+PGNVRkF1dG9yPntVRn08L2NVRkF1dG9yPjxDTlBKPntDTlBKfTwvQ05QSj48ZGlzdE5TVT48dWx0TlNVPntOU1V9PC91bHROU1U+PC9kaXN0TlNVPjwvZGlzdERGZUludD48L25mZURhZG9zTXNnPjwvbmZlRGlzdERGZUludGVyZXNzZT48L3NvYXAxMjpCb2R5Pjwvc29hcDEyOkVudmVsb3BlPg=="
+  },
+  "services":
+  {
+    "nfeDistDFeInteresse": "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx"
+		}
+}
