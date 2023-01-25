@@ -134,7 +134,7 @@ var
   F2: TSearchRec;
   Emitente, TipoEvento: string;
   procEventoCTe, infEvento: IXMLNode;
-  Ret2: Integer;
+//  Ret2: Integer;
 begin
   // Resolve os xmls de eventos (cancelamento e carta de correcao) separando carta de correção e cancelamento
   procEventoCTe := XMLDocument1.ChildNodes.FindNode('procEventoCTe');
@@ -157,7 +157,7 @@ begin
       MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\eventos\'+TipoEvento))+'\'+NomeArquivo));
 
       // procura o xml do cte cancelado e move para o diret[orio correto
-      Ret2 := FindFirst(DiretorioDase+'\'+infEvento.ChildNodes.FindNode('chCTe').Text+'-pro-cte.xml', faAnyFile, F2);
+//      Ret2 := FindFirst(DiretorioDase+'\'+infEvento.ChildNodes.FindNode('chCTe').Text+'-pro-cte.xml', faAnyFile, F2);
       MoveFile(PChar(DiretorioDase+'\'+F2.Name),PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\CTe cancelado\'))+F2.Name));
       FindClose(F2);
     end;
