@@ -3,7 +3,9 @@ program PRJSeparadorDeXML;
 uses
   Vcl.Forms,
   UntSeparadordeXML in 'UntSeparadordeXML.pas' {FrmSeparadordeXML},
-  SevenZip in 'Classes\SevenZip.pas';
+  SevenZip in 'Classes\SevenZip.pas',
+  UntEmail in 'Classes\UntEmail.pas',
+  UntLog in 'Classes\UntLog.pas';
 
 {$R *.res}
   {$WARN SYMBOL_PLATFORM OFF}
