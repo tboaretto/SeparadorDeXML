@@ -8,18 +8,18 @@ uses
   Vcl.StdCtrls, Vcl.ExtCtrls,VCL.FileCtrl, System.ZLib ,SevenZip, REST.Client, REST.Authenticator.Basic, REST.Types,
   IPPeerClient, Data.Bind.Components, Data.Bind.ObjectScope,
   System.JSON, System.NetEncoding, System.Zip, System.DateUtils, System.Threading, IWSystem,
-  Vcl.ComCtrls, StrUtils, Vcl.Imaging.GIFImg, UntLog, System.IniFiles;
+  Vcl.ComCtrls, StrUtils, Vcl.Imaging.GIFImg, UntLog, System.IniFiles,
+  System.ImageList, Vcl.ImgList, Vcl.Grids;
 
 type
   TFrmSeparadordeXML = class(TForm)
     XMLDocument1: TXMLDocument;
     pnl1: TPanel;
-    Button1: TButton;
+    btnExecutar: TButton;
     EdtOrigemXML: TLabeledEdit;
     EdtDestinoXML: TLabeledEdit;
     BtnOrigemXML: TButton;
     BtnDestinoXML: TButton;
-    Button2: TButton;
     RESTClientTecnoSpeed: TRESTClient;
     RESTRequestTecnoSpeed: TRESTRequest;
     RESTResponseTecnoSpeed: TRESTResponse;
@@ -29,16 +29,21 @@ type
     DateFinal: TDateTimePicker;
     Label3: TLabel;
     lblContador: TLabel;
-    procedure Button1Click(Sender: TObject);
+    ListView1: TListView;
+    btnBaixar: TButton;
+    CheckVerify: TCheckBox;
+    procedure btnExecutarClick(Sender: TObject);
     procedure BtnOrigemXMLClick(Sender: TObject);
     procedure BtnDestinoXMLClick(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnBaixarClick(Sender: TObject);
   private
     { Private declarations }
+    var
+    FTimer: Cardinal;
+    FEvent: THandle;
     TotalUser: Integer;
-    VerifyThreadTimer: Boolean;
     VerifyThread: Boolean;
     LThread, LThreadTimer: TThread;
     User, Password, UserEmail, PasswordEmail, DataUltimaBaixa, DataInicial, DataFinal, ParametroGrupo,
@@ -54,6 +59,7 @@ type
     function BaixarXML(protocolo: string): Boolean;
     function TrocaCaracterEspecial(aTexto : string; aLimExt : boolean) : string;
     function GetConfiguracao(Secao, Parametro, ValorPadrao: String): string;
+    function VerificaLoteMensal: Boolean;
 
     procedure Executar(Diretorio, DiretorioFinal: string);
     procedure CarregaConfiguracao;
@@ -61,16 +67,15 @@ type
     procedure Inutilizacao(DiretorioDase, DiretorioDestino, NomeArquivo: string);
     procedure CTEs(DiretorioDase, DiretorioDestino, NomeArquivo: string);
     procedure CarregarRest;
-    procedure ManipulaArquivoProtocolo;
     procedure DescompactaArquivo(Arquivo, Destino: String);
     procedure CompactaArquivo(Arquivo, Destino: String);
-    procedure VerificaLoteBaixar;
     procedure DisparaEmail(Arquivo: String);
     procedure SetConfiguracao(Secao, Parametro, ValorPadrao: String);
-    procedure LimpaArquivo(Arquivo: String);
+    procedure CarregaGrid;
+    procedure ManipulaGridProtocolo(Total: Boolean);
+    procedure VerificaLoteGrid;
+    procedure AtualizaArquivo(Cnpj, Protocolo, DataUltimaConsulta: String);
 
-
-    procedure ThreadEndTimer(Sender: TObject);
     procedure ThreadEnd(Sender: TObject);
     procedure ThreadExecution;
     procedure ThreadExecutionTimer;
@@ -78,7 +83,6 @@ type
 
     const ARQUIVOUSUARIOS = 'PRJSeparadorDeXML.cfg';
     const ARQUIVOCONFIG = 'PRJSeparadorDeXML.ini';
-    const BAIXALOTE = 'BaixaLote.cfg';
   public
     { Public declarations }
   end;
@@ -93,6 +97,31 @@ uses
   UntEmail;
 
 {$R *.dfm}
+
+procedure TFrmSeparadordeXML.AtualizaArquivo(Cnpj, Protocolo, DataUltimaConsulta: String);
+var
+  I: Integer;
+  Lista: TStringList;
+  DataArq: string;
+begin
+  Lista := TStringList.Create;
+  try
+    Lista.LoadFromFile(gsAppPath + ARQUIVOUSUARIOS);
+    for I := 0 to Pred(Lista.Count) do
+    begin
+      if Pos(Cnpj, Lista[I]) > 0 then
+      begin
+        DataArq := Lista.Strings[I].Split(['='])[5];
+        Lista.Strings[I] := StringReplace(Lista.Strings[I], DataArq, DataUltimaConsulta, [rfIgnoreCase]);
+        Lista.SaveToFile(gsAppPath + ARQUIVOUSUARIOS);
+      end;
+
+    end;
+
+  finally
+    Lista.Free;
+  end;
+end;
 
 function TFrmSeparadordeXML.BaixarXML(protocolo: string): Boolean;
 var
@@ -224,7 +253,7 @@ begin
   Result := toma.ChildNodes.FindNode('xNome').Text;
 end;
 
-procedure TFrmSeparadordeXML.Button1Click(Sender: TObject);
+procedure TFrmSeparadordeXML.btnExecutarClick(Sender: TObject);
 begin
   if EdtOrigemXML.Text = EdtDestinoXML.Text then
      ShowMessage('Caminhos de origem e destino não podem ser iguais')
@@ -232,13 +261,10 @@ begin
     Executar(EdtOrigemXML.Text, EdtDestinoXML.Text);
 end;
 
-procedure TFrmSeparadordeXML.Button2Click(Sender: TObject);
+procedure TFrmSeparadordeXML.btnBaixarClick(Sender: TObject);
 var
   Dias: Integer;
 begin
-  if not FileExists(gsAppPath + ARQUIVOUSUARIOS) then
-    raise Exception.Create('Arquivo de configuração não encontrado');
-
   Dias := DaysBetween(DateIni.Date,
   DateFinal.Date);
 
@@ -259,9 +285,34 @@ begin
   Password := GetConfiguracao('TECNOSPEED', 'Password', '');
   UserEmail := GetConfiguracao('EMAIL', 'UserEmail', '');
   PasswordEmail := GetConfiguracao('EMAIL', 'PasswordEmail', '');
-  DataUltimaBaixa := GetConfiguracao('ULTIMA BAIXA', 'DataBaixaLote', '');
-  if DataUltimaBaixa = EmptyStr then
-    DataUltimaBaixa := DateToStr(Today - 1);
+end;
+
+procedure TFrmSeparadordeXML.CarregaGrid;
+var
+  Items: TStringList;
+  I: Integer;
+begin
+  Items := TStringList.Create;
+  try
+    Items.LoadFromFile(gsAppPath + ARQUIVOUSUARIOS);
+    for I := 0 to Pred(Items.Count) do
+    begin
+      if Items[I].IndexOf('=') > 0 then
+      begin
+        with ListView1.Items.Add do
+        begin
+          Caption := Items[I].Split(['='])[0];
+          SubItems.Add(Items[I].Split(['='])[1]);
+          SubItems.Add(Items[I].Split(['='])[2]);
+          SubItems.Add(Items[I].Split(['='])[3]);
+          SubItems.Add(Items[I].Split(['='])[4]);
+          SubItems.Add(Items[I].Split(['='])[5]);
+        end;
+      end;
+    end;
+  finally
+    Items.Free;
+  end;
 end;
 
 procedure TFrmSeparadordeXML.CarregarRest;
@@ -577,7 +628,7 @@ procedure TFrmSeparadordeXML.FormClose(Sender: TObject;
 var
   resp: Integer;
 begin
-  if VerifyThread or VerifyThreadTimer then
+  if VerifyThread then
   begin
     resp := Application.messagebox('Tarefa em execução, deseja finalizar a aplicação ?','Confirma',mb_iconquestion+MB_YESNO);
      case resp of
@@ -585,9 +636,7 @@ begin
         begin
           LThread.Terminate;
           LThread.WaitFor;
-          LThreadTimer.Terminate;
-          LThreadTimer.WaitFor;
-          Application.Terminate;
+
         end;
         idno:
         begin
@@ -595,32 +644,21 @@ begin
         end;
      end;
   end;
-  LimpaArquivo(gsAppPath + BAIXALOTE);
+  SetEvent(FEvent);
+  CloseHandle(FEvent);
+  LThreadTimer.Terminate;
+  LThreadTimer.WaitFor;
   Application.Terminate;
 end;
 
 procedure TFrmSeparadordeXML.FormCreate(Sender: TObject);
-var
-  PrimeiroDia, PrimeiroDiaAlt, UltimoDiaAlt: TDate;
 begin
+  CarregaGrid;
+  CarregaConfiguracao;
   DateIni.Date := Now;
   DateFinal.Date := Now;
   VerifyThread := False;
-  CarregaConfiguracao;
-  PrimeiroDia := StartOfTheMonth(Date);
-  if (Today = PrimeiroDia) and (Today <> StrToDate(DataUltimaBaixa)) then
-  begin
-    UltimoDiaAlt := PrimeiroDia - 1;
-    PrimeiroDiaAlt := StartOfTheMonth(UltimoDiaAlt);
-    DataInicial := FormatDateTime('YYYY-mm-dd', PrimeiroDiaAlt);
-    DataFinal := FormatDateTime('YYYY-mm-dd', UltimoDiaAlt);
-
-    if not FileExists(gsAppPath + ARQUIVOUSUARIOS) then
-      raise Exception.Create('Arquivo de configuração não encontrado');
-
-    ThreadExecution;
-    SetConfiguracao('ULTIMA BAIXA', 'DataBaixaLote', DateToStr(Today));
-  end;
+  ThreadExecutionTimer;
 end;
 
 function TFrmSeparadordeXML.GetConfiguracao(Secao, Parametro,
@@ -652,46 +690,45 @@ begin
   end;
 end;
 
-procedure TFrmSeparadordeXML.LimpaArquivo(Arquivo: String);
-var
-  txt: TextFile;
-begin
-  AssignFile(txt, Arquivo);
-  try
-    Rewrite(txt);
-  finally
-    CloseFile(txt);
-  end;
-end;
-
-procedure TFrmSeparadordeXML.ManipulaArquivoProtocolo;
+procedure TFrmSeparadordeXML.ManipulaGridProtocolo(Total: Boolean);
 var
   I: Integer;
-  ListaParametros: TStringList;
-  ParametrosFrase, Protocolo: string;
+  Protocolo: string;
+  TotalRegistros: Boolean;
 begin
-  ListaParametros := TStringList.Create;
-  try
-    ListaParametros.LoadFromFile(gsAppPath + ARQUIVOUSUARIOS);
-    for I := 0 to Pred(ListaParametros.Count) do
-    begin
-      if ListaParametros[I].IndexOf('=') > 0 then
+  if Total then
+    TotalRegistros := True
+  else
+    TotalRegistros := CheckVerify.Checked;
+
+  if (ListView1.ItemIndex >= 0) or (TotalRegistros) then
+  begin
+      for I := 0 to Pred(ListView1.Items.Count) do
       begin
-        ParametrosFrase := ListaParametros[I].Split(['*'])[0];
-        ParametroGrupo := ParametrosFrase.Split(['='])[0];
-        ParametroCnpj :=  ParametrosFrase.Split(['='])[1];
-        Protocolo := CriarProtocolo;
-        if Protocolo <> EmptyStr then
+        if (ListView1.Items[I].Selected) or (TotalRegistros) then
         begin
-          ListaParametros.Strings[I] := ParametrosFrase + '*' + Protocolo + '*True';
-          ListaParametros.SaveToFile(gsAppPath + ARQUIVOUSUARIOS);
-          Protocolo := '';
+          ParametroGrupo := ListView1.Items.Item[I].Caption;
+          ParametroCnpj  := ListView1.Items.Item[I].SubItems.Strings[1];
+          Protocolo := CriarProtocolo;
+          if Protocolo <> '' then
+          begin
+            TThread.Synchronize(TThread.CurrentThread,
+            procedure
+            begin
+              with ListView1.Items[I] do
+              begin
+                SubItems[3] := Protocolo;
+                SubItems[4] := 'CONSULTANDO';
+              end;
+              TotalUser := TotalUser  + 1;
+              lblContador.Caption := IntToStr(TotalUser);
+            end);
+          end;
         end;
       end;
-    end;
-  finally
-    ListaParametros.Free;
-  end;
+  end
+  else
+    raise Exception.Create('Selecione um item para o processo.');
 end;
 
 function TFrmSeparadordeXML.RecursiveDelete(FullPath: String): Boolean;
@@ -740,35 +777,17 @@ begin
   Result := Attr and Val = Val;
 end;
 
-procedure TFrmSeparadordeXML.ThreadEndTimer(Sender: TObject);
-begin
-  if Assigned(TThread(Sender).FatalException) then
-    Application.messagebox(PChar(Exception(TThread(Sender).FatalException).Message),'Erro',MB_ICONERROR+MB_OK)
-  else
-  begin
-    if TotalUser = 0 then
-      Application.MessageBox('Processo Finalizado!!', 'Informação',MB_ICONINFORMATION+MB_OK);
-  end;
-end;
-
 procedure TFrmSeparadordeXML.ThreadEnd(Sender: TObject);
 begin
   if Assigned(TThread(Sender).FatalException) then
-    Application.messagebox(PChar(Exception(TThread(Sender).FatalException).Message),'Erro',MB_ICONERROR+MB_OK)
-  else
-  begin
-    if TotalUser = 0 then
-      Application.MessageBox('Processo Finalizado!!', 'Informação',MB_ICONINFORMATION+MB_OK)
-    else
-      ThreadExecutionTimer;
-  end;
+    Application.messagebox(PChar(Exception(TThread(Sender).FatalException).Message),'Erro',MB_ICONERROR+MB_OK);
 end;
 
 procedure TFrmSeparadordeXML.ThreadExecution;
 var
   PrevCur: TCursor;
 begin
-  if VerifyThread or VerifyThreadTimer then
+  if VerifyThread then
   begin
     Application.MessageBox('Já existe uma tarefa em processamento, por favor aguarde.', 'Informação',MB_ICONINFORMATION+MB_OK);
     Exit;
@@ -786,8 +805,7 @@ begin
         end);
 
         VerifyThread := True;
-        ManipulaArquivoProtocolo;
-        VerificaLoteBaixar;
+        ManipulaGridProtocolo(False);
       finally
         LThread.Terminate;
         VerifyThread := False;
@@ -801,48 +819,41 @@ begin
 end;
 
 procedure TFrmSeparadordeXML.ThreadExecutionTimer;
-var
-  FTimer: Cardinal;
-  FEvent: THandle;
-  PrevCurTimer: TCursor;
 begin
-  if VerifyThread or VerifyThreadTimer then
-    Exit;
-
   FTimer := 10000;
   FEvent := CreateEvent( nil, false, false, nil );
-  PrevCurTimer := Screen.Cursor;
   LThreadTimer := TThread.CreateAnonymousThread(
     procedure
     begin
       try
-        while (not LThreadTimer.CheckTerminated) and (TotalUser > 0) do
+        while not LThreadTimer.CheckTerminated do
           try
-            TThread.Synchronize(TThread.CurrentThread,
-            procedure
-            begin
-              Screen.Cursor := crHourGlass;
-            end);
-            VerifyThreadTimer := True;
-            VerificaLoteBaixar;
-          finally
-            TThread.Synchronize(TThread.CurrentThread,
-            procedure
-            begin
-              Screen.Cursor := PrevCurTimer;
-            end);
+            try
+              if not VerifyThread then
+              begin
+                if VerificaLoteMensal then
+                begin
+                  ManipulaGridProtocolo(True);
+                  SetConfiguracao('ULTIMA BAIXA', 'DataBaixaLote', DateToStr(Today));
+                end;
 
-            if (not LThreadTimer.CheckTerminated) and (TotalUser > 0) then
+                VerificaLoteGrid;
+              end;
+            except
+              on E: Exception do
+              begin
+                Log.CriarLogException(E);
+              end;
+            end;
+          finally
               WaitForSingleObject(FEvent, FTimer);
           end;
       finally
         LThreadTimer.Terminate;
-        VerifyThreadTimer := False;
       end;
     end
   );
   LThreadTimer.FreeOnTerminate := False;
-  LThreadTimer.OnTerminate := ThreadEndTimer;
   LThreadTimer.Start;
 end;
 
@@ -891,71 +902,57 @@ begin
   Result := Diret;
 end;
 
-procedure TFrmSeparadordeXML.VerificaLoteBaixar;
+procedure TFrmSeparadordeXML.VerificaLoteGrid;
 var
-  I, ContArray: Integer;
-  Items: array of Integer;
-  ListaParametros, NovaListaParametros: TStringList;
-  Status, ParametrosFrase, ProtocoloCliente, dadosResolvidos, cnpjVerify: string;
+  I: Integer;
+  ProtocoloCliente, DataMod: string;
 begin
-  ContArray := 0;
-  ListaParametros := TStringList.Create;
-  NovaListaParametros := TStringList.Create;
-  try
-    ListaParametros.LoadFromFile(gsAppPath + ARQUIVOUSUARIOS);
-    NovaListaParametros.LoadFromFile(gsAppPath + BAIXALOTE);
-    for I := 0 to Pred(ListaParametros.Count) do
+  for I := 0 to Pred(ListView1.Items.Count) do
+  begin
+    if LThreadTimer.CheckTerminated then
+        Break;
+    if ListView1.Items[I].SubItems[4] = 'CONSULTANDO' then
     begin
-      if ListaParametros[I].IndexOf('=') > 0 then
+      ParametroGrupo := ListView1.Items[I].Caption;
+      ParametroCnpj :=  ListView1.Items[I].SubItems[1];
+      ParametroEmail :=  ListView1.Items[I].SubItems[2];
+      ProtocoloCliente := ListView1.Items[I].SubItems[3];
+      if ConsultarProtocolo(ProtocoloCliente) then
       begin
-        cnpjVerify := ListaParametros[I].Split(['='])[1];
-        Status := ListaParametros[I].Split(['*'])[2];
-        dadosResolvidos := ListaParametros[I].Split(['*'])[0];
-        if Status = 'True' then
+        DataMod := DateTimeToStr(Now);
+        AtualizaArquivo(ParametroCnpj, ProtocoloCliente, DataMod);
+        TotalUser := TotalUser - 1;
+        TThread.Synchronize(TThread.CurrentThread,
+        procedure
         begin
-          if Pos(cnpjVerify, NovaListaParametros.Text) = 0 then
-            NovaListaParametros.Add(ListaParametros[I]);
-
-          ListaParametros.Strings[I] := dadosResolvidos + '*Protocolo*False';
-          ListaParametros.SaveToFile(gsAppPath + ARQUIVOUSUARIOS);
-        end;
+          ListView1.Items[I].SubItems[4] := DataMod;
+          lblContador.Caption := IntToStr(TotalUser);
+        end);
       end;
     end;
+  end;
+end;
 
-    for I := 0 to Pred(NovaListaParametros.Count) do
-    begin
-      if LThread.CheckTerminated or LThreadTimer.CheckTerminated then
-          Break;
-      if NovaListaParametros[I].IndexOf('=') > 0 then
-      begin
-        ParametrosFrase := NovaListaParametros[I].Split(['*'])[0];
-        ProtocoloCliente := NovaListaParametros[I].Split(['*'])[1];
-        ParametroGrupo := ParametrosFrase.Split(['='])[0];
-        ParametroCnpj :=  ParametrosFrase.Split(['='])[1];
-        ParametroEmail :=  ParametrosFrase.Split(['='])[2];
-        if ConsultarProtocolo(ProtocoloCliente) then
-        begin
-          ContArray := ContArray + 1;
-          SetLength(Items, Length(Items) + 1);
-          Items[ContArray] := I;
-        end;
-      end;
-    end;
+function TFrmSeparadordeXML.VerificaLoteMensal: Boolean;
+var
+  PrimeiroDia, PrimeiroDiaAlt, UltimoDiaAlt: TDate;
+begin
+  Result := False;
+  PrimeiroDia := StartOfTheMonth(Date);
+  if Today = PrimeiroDia then
+  begin
+    DataUltimaBaixa := GetConfiguracao('ULTIMA BAIXA', 'DataBaixaLote', '');
+    if DataUltimaBaixa = EmptyStr then
+      DataUltimaBaixa := DateToStr(Today - 1);
 
-    for I := 0 to Pred(Length(Items)) do
+    if Today <> StrToDate(DataUltimaBaixa) then
     begin
-      NovaListaParametros.Delete(Items[I]);
+      UltimoDiaAlt := PrimeiroDia - 1;
+      PrimeiroDiaAlt := StartOfTheMonth(UltimoDiaAlt);
+      DataInicial := FormatDateTime('YYYY-mm-dd', PrimeiroDiaAlt);
+      DataFinal := FormatDateTime('YYYY-mm-dd', UltimoDiaAlt);
+      Result := True;
     end;
-  finally
-    TotalUser := NovaListaParametros.Count;
-    NovaListaParametros.SaveToFile(gsAppPath + BAIXALOTE);
-    TThread.Synchronize(TThread.CurrentThread,
-    procedure
-    begin
-      lblContador.Caption := IntToStr(TotalUser);
-    end);
-    ListaParametros.Free;
-    NovaListaParametros.Free;
   end;
 end;
 
