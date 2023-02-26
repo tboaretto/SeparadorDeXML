@@ -4,8 +4,8 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Separador de XML'
-  ClientHeight = 326
-  ClientWidth = 517
+  ClientHeight = 456
+  ClientWidth = 787
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,8 +22,8 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
   object pnl1: TPanel
     Left = 0
     Top = 0
-    Width = 517
-    Height = 326
+    Width = 787
+    Height = 456
     Align = alClient
     BevelOuter = bvNone
     BiDiMode = bdLeftToRight
@@ -32,45 +32,45 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
     TabOrder = 0
     object Label1: TLabel
       Left = 32
-      Top = 93
+      Top = 373
       Width = 53
       Height = 13
       Caption = 'Data Inicial'
     end
     object Label2: TLabel
-      Left = 168
-      Top = 93
+      Left = 176
+      Top = 373
       Width = 48
       Height = 13
       Caption = 'Data Final'
     end
     object Label3: TLabel
-      Left = 8
-      Top = 304
+      Left = 32
+      Top = 432
       Width = 64
       Height = 13
       Caption = 'Consultando:'
     end
     object lblContador: TLabel
-      Left = 78
-      Top = 304
+      Left = 102
+      Top = 432
       Width = 6
       Height = 13
       Caption = '0'
     end
-    object Button1: TButton
-      Left = 152
-      Top = 183
-      Width = 225
-      Height = 46
+    object btnExecutar: TButton
+      Left = 639
+      Top = 418
+      Width = 114
+      Height = 27
       Caption = 'Executar'
       TabOrder = 0
-      OnClick = Button1Click
+      OnClick = btnExecutarClick
     end
     object EdtOrigemXML: TLabeledEdit
       Left = 128
       Top = 22
-      Width = 353
+      Width = 449
       Height = 21
       EditLabel.Width = 128
       EditLabel.Height = 13
@@ -81,7 +81,7 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
     object EdtDestinoXML: TLabeledEdit
       Left = 128
       Top = 64
-      Width = 353
+      Width = 449
       Height = 21
       EditLabel.Width = 131
       EditLabel.Height = 13
@@ -109,7 +109,7 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
     end
     object DateIni: TDateTimePicker
       Left = 32
-      Top = 112
+      Top = 392
       Width = 130
       Height = 21
       Date = 44960.443192337960000000
@@ -117,44 +117,88 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
       TabOrder = 5
     end
     object DateFinal: TDateTimePicker
-      Left = 168
-      Top = 112
+      Left = 176
+      Top = 392
       Width = 130
       Height = 21
       Date = 44960.443192337960000000
       Time = 44960.443192337960000000
       TabOrder = 6
     end
-    object Button2: TButton
-      Left = 152
-      Top = 235
-      Width = 225
-      Height = 46
-      Caption = 'Baixar Lote'
+    object ListView1: TListView
+      Left = 32
+      Top = 93
+      Width = 721
+      Height = 274
+      Columns = <
+        item
+          Caption = 'GRUPO'
+          Width = 55
+        end
+        item
+          Caption = 'EMPRESA'
+          Width = 178
+        end
+        item
+          Caption = 'CNPJ'
+          Width = 100
+        end
+        item
+          Caption = 'E-MAIL'
+          Width = 130
+        end
+        item
+          Caption = 'PROTOCOLO'
+          Width = 136
+        end
+        item
+          Caption = 'CONSULTA'
+          Width = 118
+        end>
+      MultiSelect = True
+      ReadOnly = True
+      RowSelect = True
       TabOrder = 7
-      OnClick = Button2Click
+      ViewStyle = vsReport
+    end
+    object btnBaixar: TButton
+      Left = 519
+      Top = 419
+      Width = 114
+      Height = 26
+      Caption = 'Baixar Lote'
+      TabOrder = 8
+      OnClick = btnBaixarClick
+    end
+    object CheckVerify: TCheckBox
+      Left = 320
+      Top = 396
+      Width = 97
+      Height = 17
+      Caption = ' Baixar Todos'
+      TabOrder = 9
     end
   end
   object XMLDocument1: TXMLDocument
-    Left = 432
-    Top = 176
+    Left = 552
+    Top = 296
   end
   object RESTClientTecnoSpeed: TRESTClient
     Params = <>
     HandleRedirects = True
-    Left = 56
-    Top = 168
+    Left = 288
+    Top = 296
   end
   object RESTRequestTecnoSpeed: TRESTRequest
     Client = RESTClientTecnoSpeed
     Params = <>
     Response = RESTResponseTecnoSpeed
     SynchronizedEvents = False
-    Left = 56
-    Top = 232
+    Left = 152
+    Top = 296
   end
   object RESTResponseTecnoSpeed: TRESTResponse
-    Left = 432
-    Top = 112
+    Left = 424
+    Top = 296
   end
 end
