@@ -20,15 +20,10 @@ type
     EdtDestinoXML: TLabeledEdit;
     BtnOrigemXML: TButton;
     BtnDestinoXML: TButton;
-    RESTClientTecnoSpeed: TRESTClient;
-    RESTRequestTecnoSpeed: TRESTRequest;
-    RESTResponseTecnoSpeed: TRESTResponse;
     DateIni: TDateTimePicker;
     Label1: TLabel;
     Label2: TLabel;
     DateFinal: TDateTimePicker;
-    Label3: TLabel;
-    lblContador: TLabel;
     ListView1: TListView;
     btnBaixar: TButton;
     CheckVerify: TCheckBox;
@@ -41,19 +36,25 @@ type
   private
     { Private declarations }
     var
+    RESTClientConsulta: TRESTClient;
+    RESTRequestConsulta: TRESTRequest;
+    RESTResponseConsulta: TRESTResponse;
+    RESTClientBaixa: TRESTClient;
+    RESTRequestBaixa: TRESTRequest;
+    RESTResponseBaixa: TRESTResponse;
     FTimer: Cardinal;
     FEvent: THandle;
     TotalUser: Integer;
-    VerifyThread: Boolean;
+    VerifyThread, RequireTLS: Boolean;
     LThread, LThreadTimer: TThread;
     User, Password, UserEmail, PasswordEmail, DataUltimaBaixa, DataInicial, DataFinal, ParametroGrupo,
-    ParametroCnpj, ParametroEmail: String;
+    ParametroCnpj, ParametroEmail, HostEmail, PortEmail, NameEmail, SubjectEmail, MessageEmail: String;
     function ClearDirectory(aDirectory : String): Boolean;
     function TemAtributo(Attr, Val: Integer): Boolean;
     function RecursiveDelete(FullPath: String): Boolean;
     function BuscaTomador: string;
     function BuscaEmitente: string;
-    function CriarProtocolo: string;
+    function CriarProtocolo(Grupo, Cnpj: String): string;
     function ConsultarProtocolo(Protocolo: String): Boolean;
     function VerificaDiretorioFinal(Diret: String): string;
     function BaixarXML(protocolo: string): Boolean;
@@ -62,11 +63,12 @@ type
     function VerificaLoteMensal: Boolean;
 
     procedure Executar(Diretorio, DiretorioFinal: string);
-    procedure CarregaConfiguracao;
+    procedure CarregarConfiguracao;
     procedure Eventos(DiretorioDase, DiretorioDestino, NomeArquivo: string);
     procedure Inutilizacao(DiretorioDase, DiretorioDestino, NomeArquivo: string);
     procedure CTEs(DiretorioDase, DiretorioDestino, NomeArquivo: string);
     procedure CarregarRest;
+    procedure CarregarRest2;
     procedure DescompactaArquivo(Arquivo, Destino: String);
     procedure CompactaArquivo(Arquivo, Destino: String);
     procedure DisparaEmail(Arquivo: String);
@@ -80,11 +82,12 @@ type
     procedure ThreadExecution;
     procedure ThreadExecutionTimer;
 
-
     const ARQUIVOUSUARIOS = 'PRJSeparadorDeXML.cfg';
     const ARQUIVOCONFIG = 'PRJSeparadorDeXML.ini';
   public
     { Public declarations }
+    procedure AfterConstruction; override;
+    procedure BeforeDestruction; override;
   end;
 
 
@@ -97,6 +100,18 @@ uses
   UntEmail;
 
 {$R *.dfm}
+
+procedure TFrmSeparadordeXML.AfterConstruction;
+begin
+  inherited;
+  RESTClientConsulta   := TRESTClient.Create(nil);;
+  RESTRequestConsulta  := TRESTRequest.Create(nil);
+  RESTResponseConsulta := TRESTResponse.Create(nil);
+
+  RESTClientBaixa      := TRESTClient.Create(nil);
+  RESTRequestBaixa     := TRESTRequest.Create(nil);
+  RESTResponseBaixa    := TRESTResponse.Create(nil);
+end;
 
 procedure TFrmSeparadordeXML.AtualizaArquivo(Cnpj, Protocolo, DataUltimaConsulta: String);
 var
@@ -115,9 +130,7 @@ begin
         Lista.Strings[I] := StringReplace(Lista.Strings[I], DataArq, DataUltimaConsulta, [rfIgnoreCase]);
         Lista.SaveToFile(gsAppPath + ARQUIVOUSUARIOS);
       end;
-
     end;
-
   finally
     Lista.Free;
   end;
@@ -133,24 +146,24 @@ begin
   Stream := TMemoryStream.Create;
   try
     try
-      CarregarRest;
-      RESTClientTecnoSpeed.ContentType := 'application/json';
-      RESTClientTecnoSpeed.BaseURL := 'https://managersaas.tecnospeed.com.br:8081';
+      CarregarRest2;
+      RESTClientBaixa.ContentType := 'application/json';
+      RESTClientBaixa.BaseURL := 'https://managersaas.tecnospeed.com.br:8081';
 
-      RESTRequestTecnoSpeed.Resource := '/api/v2/cte/exporta/'+protocolo+'/xml?grupo='+ParametroGrupo+'&cnpj='+ParametroCnpj;
-      RESTRequestTecnoSpeed.Method := TRESTRequestMethod.rmGET;
+      RESTRequestBaixa.Resource := '/api/v2/cte/exporta/'+protocolo+'/xml?grupo='+ParametroGrupo+'&cnpj='+ParametroCnpj;
+      RESTRequestBaixa.Method := TRESTRequestMethod.rmGET;
 
-      RESTRequestTecnoSpeed.Execute;
-      if RESTRequestTecnoSpeed.Response.StatusCode = 200 then
+      RESTRequestBaixa.Execute;
+      if RESTRequestBaixa.Response.StatusCode = 200 then
       begin
-        if Pos('EXCEPTION', RESTResponseTecnoSpeed.Content) <> 0 then
+        if Pos('EXCEPTION', RESTResponseBaixa.Content) <> 0 then
         begin
-          Log.CriarLogMensagem(RESTResponseTecnoSpeed.Content + ': CNPJ - ' + ParametroCnpj);
+          Log.CriarLogMensagem(RESTResponseBaixa.Content + ': CNPJ - ' + ParametroCnpj);
           Exit;
         end;
         Diretorio := gsAppPath + 'tmp\XMLTecnospeed\' + ParametroCnpj;
         ArquivoPath := Diretorio + '\' + ParametroCnpj + '.zip';
-        Arquivo := RESTResponseTecnoSpeed.RawBytes;
+        Arquivo := RESTResponseBaixa.RawBytes;
         Stream.Clear;
         Stream.Write(Arquivo, Length(Arquivo));
 
@@ -188,6 +201,18 @@ begin
   finally
     Stream.Free;
   end;
+end;
+
+procedure TFrmSeparadordeXML.BeforeDestruction;
+begin
+  RESTClientConsulta.Free;
+  RESTRequestConsulta.Free;
+  RESTResponseConsulta.Free;
+
+  RESTClientBaixa.Free;
+  RESTRequestBaixa.Free;
+  RESTResponseBaixa.Free;
+  inherited;
 end;
 
 procedure TFrmSeparadordeXML.BtnDestinoXMLClick(Sender: TObject);
@@ -265,9 +290,7 @@ procedure TFrmSeparadordeXML.btnBaixarClick(Sender: TObject);
 var
   Dias: Integer;
 begin
-  Dias := DaysBetween(DateIni.Date,
-  DateFinal.Date);
-
+  Dias := DaysBetween(DateIni.Date, DateFinal.Date);
   if Dias >= 31 then
   begin
     Application.MessageBox('Data Inicial e Data Final não podem ultrapassar limite de 31 dias de diferença.', 'Atenção',MB_ICONWARNING+MB_OK);
@@ -279,12 +302,18 @@ begin
   ThreadExecution;
 end;
 
-procedure TFrmSeparadordeXML.CarregaConfiguracao;
+procedure TFrmSeparadordeXML.CarregarConfiguracao;
 begin
-  User := GetConfiguracao('TECNOSPEED', 'User', '');
-  Password := GetConfiguracao('TECNOSPEED', 'Password', '');
-  UserEmail := GetConfiguracao('EMAIL', 'UserEmail', '');
+  User          := GetConfiguracao('TECNOSPEED', 'User', '');
+  Password      := GetConfiguracao('TECNOSPEED', 'Password', '');
+  UserEmail     := GetConfiguracao('EMAIL', 'UserEmail', '');
   PasswordEmail := GetConfiguracao('EMAIL', 'PasswordEmail', '');
+  HostEmail     := GetConfiguracao('EMAIL', 'Host', '');
+  PortEmail     := GetConfiguracao('EMAIL', 'Port', '');
+  RequireTLS    := StrToBool(GetConfiguracao('EMAIL', 'RequireTLS', ''));
+  NameEmail     := GetConfiguracao('EMAIL', 'Name', '');
+  SubjectEmail  := GetConfiguracao('EMAIL', 'Subject', '');
+  MessageEmail  := GetConfiguracao('EMAIL', 'Message', '');
 end;
 
 procedure TFrmSeparadordeXML.CarregaGrid;
@@ -318,19 +347,37 @@ end;
 procedure TFrmSeparadordeXML.CarregarRest;
 begin
   //Resetando REST para default
-  RESTClientTecnoSpeed.ResetToDefaults;
-  RESTRequestTecnoSpeed.ResetToDefaults;
-  RESTResponseTecnoSpeed.ResetToDefaults;
+  RESTClientConsulta.ResetToDefaults;
+  RESTRequestConsulta.ResetToDefaults;
+  RESTResponseConsulta.ResetToDefaults;
 
   //ObterAutenticacaoBasica - Função que passa Usuario e senha para carregar a autenticação das requisições.
   if (User <> EmptyStr) or (Password <> EmptyStr) then
-    RESTClientTecnoSpeed.Authenticator := THTTPBasicAuthenticator.Create(User, Password)
+    RESTClientConsulta.Authenticator := THTTPBasicAuthenticator.Create(User, Password)
   else
     raise Exception.Create('Usuário/Senha não configurado!!');
 
   //Seta qual o Client e Response vai ser utilizado no request.
-  RESTRequestTecnoSpeed.Client := RESTClientTecnoSpeed;
-  RESTRequestTecnoSpeed.Response := RESTResponseTecnoSpeed;
+  RESTRequestConsulta.Client := RESTClientConsulta;
+  RESTRequestConsulta.Response := RESTResponseConsulta;
+end;
+
+procedure TFrmSeparadordeXML.CarregarRest2;
+begin
+   //Resetando REST2 para default
+  RESTClientBaixa.ResetToDefaults;
+  RESTRequestBaixa.ResetToDefaults;
+  RESTResponseBaixa.ResetToDefaults;
+
+  //ObterAutenticacaoBasica - Função que passa Usuario e senha para carregar a autenticação das requisições.
+  if (User <> EmptyStr) or (Password <> EmptyStr) then
+    RESTClientBaixa.Authenticator := THTTPBasicAuthenticator.Create(User, Password)
+  else
+    raise Exception.Create('Usuário/Senha não configurado!!');
+
+  //Seta qual o Client e Response vai ser utilizado no request.
+  RESTRequestBaixa.Client := RESTClientBaixa;
+  RESTRequestBaixa.Response := RESTResponseBaixa;
 end;
 
 function TFrmSeparadordeXML.ClearDirectory(aDirectory: String): Boolean;
@@ -376,22 +423,22 @@ var
 begin
   try
     Result := False;
-    CarregarRest;
-    RESTClientTecnoSpeed.ContentType := 'application/json';
-    RESTClientTecnoSpeed.BaseURL := 'https://managersaas.tecnospeed.com.br:8081';
+    CarregarRest2;
+    RESTClientBaixa.ContentType := 'application/json';
+    RESTClientBaixa.BaseURL := 'https://managersaas.tecnospeed.com.br:8081';
 
-    RESTRequestTecnoSpeed.Resource := '/api/v2/cte/exporta/'+protocolo+'?grupo='+ParametroGrupo+'&cnpj='+ParametroCnpj;
-    RESTRequestTecnoSpeed.Method := TRESTRequestMethod.rmGET;
+    RESTRequestBaixa.Resource := '/api/v2/cte/exporta/'+protocolo+'?grupo='+ParametroGrupo+'&cnpj='+ParametroCnpj;
+    RESTRequestBaixa.Method := TRESTRequestMethod.rmGET;
 
-    RESTRequestTecnoSpeed.Execute;
-    if RESTRequestTecnoSpeed.Response.StatusCode = 200 then
+    RESTRequestBaixa.Execute;
+    if RESTRequestBaixa.Response.StatusCode = 200 then
     begin
-      if Pos('EXCEPTION', RESTResponseTecnoSpeed.Content) <> 0 then
+      if Pos('EXCEPTION', RESTResponseBaixa.Content) <> 0 then
       begin
-          Log.CriarLogMensagem(RESTResponseTecnoSpeed.Content + ': CNPJ - ' + ParametroCnpj);
+          Log.CriarLogMensagem(RESTResponseBaixa.Content + ': CNPJ - ' + ParametroCnpj);
           Exit;
       end;
-      response := RESTResponseTecnoSpeed.JSONValue as TJSONObject;
+      response := RESTResponseBaixa.JSONValue as TJSONObject;
       FMensagem := response.GetValue('mensagem').Value;
       if FMensagem = 'Operação concluída, nenhum registro encontrado para o filtro utilizado.' then
       begin
@@ -410,7 +457,7 @@ begin
       end;
     end
     else
-         Log.CriarLogMensagem('Falha na requisição da consulta para o CNPJ ' + ParametroCnpj + ' - ' + IntToStr(RESTRequestTecnoSpeed.Response.StatusCode) +' - ' + RESTRequestTecnoSpeed.Response.StatusText);
+         Log.CriarLogMensagem('Falha na requisição da consulta para o CNPJ ' + ParametroCnpj + ' - ' + IntToStr(RESTRequestBaixa.Response.StatusCode) +' - ' + RESTRequestBaixa.Response.StatusText);
   except
     on E: Exception do
     begin
@@ -420,7 +467,7 @@ begin
   end;
 end;
 
-function TFrmSeparadordeXML.CriarProtocolo: String;
+function TFrmSeparadordeXML.CriarProtocolo(Grupo, Cnpj: String): String;
 var
    objeto, response: TJSONObject;
 begin
@@ -432,28 +479,28 @@ begin
       objeto.AddPair('pdf', TJSONBool.Create(False));
 
       CarregarRest;
-      RESTClientTecnoSpeed.ContentType := 'application/json';
-      RESTClientTecnoSpeed.BaseURL := 'https://managersaas.tecnospeed.com.br:8081';
+      RESTClientConsulta.ContentType := 'application/json';
+      RESTClientConsulta.BaseURL := 'https://managersaas.tecnospeed.com.br:8081';
 
-      RESTRequestTecnoSpeed.Resource := '/api/v2/cte/exporta?grupo='+ParametroGrupo+'&cnpj='+ParametroCnpj;
-      RESTRequestTecnoSpeed.Method := TRESTRequestMethod.rmPOST;
+      RESTRequestConsulta.Resource := '/api/v2/cte/exporta?grupo='+Grupo+'&cnpj='+Cnpj;
+      RESTRequestConsulta.Method := TRESTRequestMethod.rmPOST;
 
-      RESTRequestTecnoSpeed.AddBody(objeto.ToString, ContentTypeFromString('application/json'));
+      RESTRequestConsulta.AddBody(objeto.ToString, ContentTypeFromString('application/json'));
 
-      RESTRequestTecnoSpeed.Execute;
-      if RESTRequestTecnoSpeed.Response.StatusCode = 200 then
+      RESTRequestConsulta.Execute;
+      if RESTRequestConsulta.Response.StatusCode = 200 then
       begin
-        if Pos('EXCEPTION', RESTResponseTecnoSpeed.Content) <> 0 then
+        if Pos('EXCEPTION', RESTResponseConsulta.Content) <> 0 then
         begin
-          Log.CriarLogMensagem(RESTResponseTecnoSpeed.Content + ': CNPJ - ' + ParametroCnpj);
+          Log.CriarLogMensagem(RESTResponseConsulta.Content + ': CNPJ - ' + Cnpj);
           Exit;
         end;
 
-        response := RESTResponseTecnoSpeed.JSONValue as TJSONObject;
+        response := RESTResponseConsulta.JSONValue as TJSONObject;
         Result := response.GetValue('protocolo').Value;
       end
       else
-        Log.CriarLogMensagem('Falha na criação do protocolo: CNPJ - '+ParametroCnpj);
+        Log.CriarLogMensagem('Falha na criação do protocolo: CNPJ - '+Cnpj);
     except
       on E: Exception do
       begin
@@ -504,15 +551,16 @@ var
 begin
   Email := TEmail.Create;
   try
-    Email.Host := 'smtp.gmail.com';
-    Email.Port := 587;
+    Email.Host := HostEmail;
+    Email.Port := StrToInt(PortEmail);
     Email.Username := UserEmail;
     Email.Password := PasswordEmail;
     Email.EmailAddress := UserEmail;
-    Email.Name := 'Sialog';
+    Email.RequireTLS := RequireTLS;
+    Email.Name := NameEmail;
     Email.EmailDestiny := ParametroEmail;
-    Email.Subject := 'Envio Lote XML-CTE';
-    Email.Message := 'O arquivo referente ao Conhecimento de Transporte eletrônico foram anexados a este email.';
+    Email.Subject := SubjectEmail;
+    Email.Message := MessageEmail;
     Email.EnviarEmail(Arquivo);
   finally
     Email.Free;
@@ -636,7 +684,6 @@ begin
         begin
           LThread.Terminate;
           LThread.WaitFor;
-
         end;
         idno:
         begin
@@ -654,7 +701,7 @@ end;
 procedure TFrmSeparadordeXML.FormCreate(Sender: TObject);
 begin
   CarregaGrid;
-  CarregaConfiguracao;
+  CarregarConfiguracao;
   DateIni.Date := Now;
   DateFinal.Date := Now;
   VerifyThread := False;
@@ -693,7 +740,7 @@ end;
 procedure TFrmSeparadordeXML.ManipulaGridProtocolo(Total: Boolean);
 var
   I: Integer;
-  Protocolo: string;
+  Grupo, Cnpj, Protocolo: string;
   TotalRegistros: Boolean;
 begin
   if Total then
@@ -707,22 +754,24 @@ begin
       begin
         if (ListView1.Items[I].Selected) or (TotalRegistros) then
         begin
-          ParametroGrupo := ListView1.Items.Item[I].Caption;
-          ParametroCnpj  := ListView1.Items.Item[I].SubItems.Strings[1];
-          Protocolo := CriarProtocolo;
-          if Protocolo <> '' then
+          if ListView1.Items.Item[I].SubItems.Strings[4] <> 'CONSULTANDO' then
           begin
-            TThread.Synchronize(TThread.CurrentThread,
-            procedure
+            Grupo := ListView1.Items.Item[I].Caption;
+            Cnpj  := ListView1.Items.Item[I].SubItems.Strings[1];
+            Protocolo := CriarProtocolo(Grupo, Cnpj);
+            if Protocolo <> '' then
             begin
-              with ListView1.Items[I] do
+              TThread.Synchronize(TThread.CurrentThread,
+              procedure
               begin
-                SubItems[3] := Protocolo;
-                SubItems[4] := 'CONSULTANDO';
-              end;
-              TotalUser := TotalUser  + 1;
-              lblContador.Caption := IntToStr(TotalUser);
-            end);
+                with ListView1.Items[I] do
+                begin
+                  SubItems[3] := Protocolo;
+                  SubItems[4] := 'CONSULTANDO';
+                end;
+                TotalUser := TotalUser  + 1;
+              end);
+            end;
           end;
         end;
       end;
@@ -829,16 +878,13 @@ begin
         while not LThreadTimer.CheckTerminated do
           try
             try
-              if not VerifyThread then
+              if VerificaLoteMensal then
               begin
-                if VerificaLoteMensal then
-                begin
-                  ManipulaGridProtocolo(True);
-                  SetConfiguracao('ULTIMA BAIXA', 'DataBaixaLote', DateToStr(Today));
-                end;
-
-                VerificaLoteGrid;
+                ManipulaGridProtocolo(True);
+                SetConfiguracao('ULTIMA BAIXA', 'DataBaixaLote', DateToStr(Today));
               end;
+
+              VerificaLoteGrid;
             except
               on E: Exception do
               begin
@@ -926,7 +972,6 @@ begin
         procedure
         begin
           ListView1.Items[I].SubItems[4] := DataMod;
-          lblContador.Caption := IntToStr(TotalUser);
         end);
       end;
     end;
