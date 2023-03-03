@@ -44,20 +44,6 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
       Height = 13
       Caption = 'Data Final'
     end
-    object Label3: TLabel
-      Left = 32
-      Top = 432
-      Width = 64
-      Height = 13
-      Caption = 'Consultando:'
-    end
-    object lblContador: TLabel
-      Left = 102
-      Top = 432
-      Width = 6
-      Height = 13
-      Caption = '0'
-    end
     object btnExecutar: TButton
       Left = 639
       Top = 418
@@ -180,25 +166,7 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
     end
   end
   object XMLDocument1: TXMLDocument
-    Left = 552
-    Top = 296
-  end
-  object RESTClientTecnoSpeed: TRESTClient
-    Params = <>
-    HandleRedirects = True
-    Left = 288
-    Top = 296
-  end
-  object RESTRequestTecnoSpeed: TRESTRequest
-    Client = RESTClientTecnoSpeed
-    Params = <>
-    Response = RESTResponseTecnoSpeed
-    SynchronizedEvents = False
-    Left = 152
-    Top = 296
-  end
-  object RESTResponseTecnoSpeed: TRESTResponse
-    Left = 424
+    Left = 688
     Top = 296
   end
 end

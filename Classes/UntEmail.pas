@@ -23,6 +23,7 @@ type
     FEmailDestiny: string;
     FSubject: string;
     FMessage: string;
+    FRequireTLS: boolean;
   public
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
@@ -38,6 +39,7 @@ type
     property EmailDestiny: string read FEmailDestiny write FEmailDestiny;
     property Subject: string read FSubject write FSubject;
     property Message: string read FMessage write FMessage;
+    property RequireTLS: boolean read FRequireTLS write FRequireTLS;
   end;
 
 implementation
@@ -63,7 +65,7 @@ end;
 
 procedure TEmail.EnviarEmail(arquivo: string);
 begin
-  //segurança
+  //Segurança
   with LSocketSSL do
   begin
     with SSLOptions do
@@ -71,8 +73,6 @@ begin
       Mode := sslmClient;
       Method := sslvTLSv1_2;
     end;
-    Host := FHost;
-    Port := FPort;
   end;
 
   //SMTP
@@ -84,10 +84,13 @@ begin
     AuthType := satDefault;
     UserName := FUsername;
     Password := FPassword;
-    UseTLS := utUseExplicitTLS;
+    if FRequireTLS = True then
+      UseTLS := utUseRequireTLS
+    else
+      UseTLS := utUseImplicitTLS;
   end;
 
-  //SMTP
+  //Message
   with LMessage do
   begin
     From.Address := EmailAddress;
@@ -102,10 +105,14 @@ begin
     TIdAttachmentFile.Create(LMessage.MessageParts, arquivo);
 
   try
-    LSMPTP.Connect;
-    LSMPTP.Send(LMessage);
-  except
-    raise Exception.Create('Falha ao enviar E-mail!!');
+    try
+      LSMPTP.Connect;
+      LSMPTP.Send(LMessage);
+    except
+      raise Exception.Create('Falha ao enviar E-mail!!');
+    end;
+  finally
+    LSMPTP.Disconnect;
   end;
 end;
 
