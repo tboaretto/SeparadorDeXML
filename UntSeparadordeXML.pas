@@ -15,18 +15,19 @@ type
   TFrmSeparadordeXML = class(TForm)
     XMLDocument1: TXMLDocument;
     pnl1: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
     btnExecutar: TButton;
     EdtOrigemXML: TLabeledEdit;
     EdtDestinoXML: TLabeledEdit;
     BtnOrigemXML: TButton;
     BtnDestinoXML: TButton;
     DateIni: TDateTimePicker;
-    Label1: TLabel;
-    Label2: TLabel;
     DateFinal: TDateTimePicker;
     ListView1: TListView;
     btnBaixar: TButton;
     CheckVerify: TCheckBox;
+    CheckEmail: TCheckBox;
     procedure btnExecutarClick(Sender: TObject);
     procedure BtnOrigemXMLClick(Sender: TObject);
     procedure BtnDestinoXMLClick(Sender: TObject);
@@ -47,8 +48,8 @@ type
     TotalUser: Integer;
     VerifyThread, RequireTLS: Boolean;
     LThread, LThreadTimer: TThread;
-    User, Password, UserEmail, PasswordEmail, DataUltimaBaixa, DataInicial, DataFinal, ParametroGrupo,
-    ParametroCnpj, ParametroEmail, HostEmail, PortEmail, NameEmail, SubjectEmail, MessageEmail: String;
+    User, Password, DisparaEmail, UserEmail, PasswordEmail, DataUltimaBaixa, DataInicial, DataFinal, ParametroGrupo,
+    ParametroNome, ParametroCnpj, ParametroEmail, HostEmail, PortEmail, NameEmail, SubjectEmail, MessageEmail: String;
     function ClearDirectory(aDirectory : String): Boolean;
     function TemAtributo(Attr, Val: Integer): Boolean;
     function RecursiveDelete(FullPath: String): Boolean;
@@ -71,7 +72,7 @@ type
     procedure CarregarRest2;
     procedure DescompactaArquivo(Arquivo, Destino: String);
     procedure CompactaArquivo(Arquivo, Destino: String);
-    procedure DisparaEmail(Arquivo: String);
+    procedure EnviaArquivo(Arquivo: String);
     procedure SetConfiguracao(Secao, Parametro, ValorPadrao: String);
     procedure CarregaGrid;
     procedure ManipulaGridProtocolo(Total: Boolean);
@@ -161,14 +162,14 @@ begin
           Log.CriarLogMensagem(RESTResponseBaixa.Content + ': CNPJ - ' + ParametroCnpj);
           Exit;
         end;
-        Diretorio := gsAppPath + 'tmp\XMLTecnospeed\' + ParametroCnpj;
-        ArquivoPath := Diretorio + '\' + ParametroCnpj + '.zip';
+        Diretorio := gsAppPath + 'tmp\XMLTecnospeed\' + ParametroNome;
+        ArquivoPath := Diretorio + '\' + ParametroNome + '.zip';
         Arquivo := RESTResponseBaixa.RawBytes;
         Stream.Clear;
         Stream.Write(Arquivo, Length(Arquivo));
 
-        if not SysUtils.DirectoryExists(gsAppPath + 'tmp\XMLTecnospeed\' + ParametroCnpj) then
-            SysUtils.ForceDirectories(gsAppPath+ 'tmp\XMLTecnospeed\' + ParametroCnpj)
+        if not SysUtils.DirectoryExists(gsAppPath + 'tmp\XMLTecnospeed\' + ParametroNome) then
+            SysUtils.ForceDirectories(gsAppPath+ 'tmp\XMLTecnospeed\' + ParametroNome)
         else
           ClearDirectory(Diretorio);
         //Salvar arquivo byte
@@ -176,8 +177,12 @@ begin
 
         DescompactaArquivo(ArquivoPath, Diretorio);
 
-        DiretorioFinal := gsAppPath + 'tmp\XML\' + ParametroCnpj;
-        LoteXML := gsAppPath + 'tmp\XML\' + ParametroCnpj + '.zip';
+        if (EdtDestinoXML.Text <> '') and (SysUtils.DirectoryExists(EdtDestinoXML.Text)) then
+          DiretorioFinal := EdtDestinoXML.Text + '\' + ParametroNome
+        else
+          DiretorioFinal := gsAppPath + 'tmp\XML\' + ParametroNome;
+
+        LoteXML := DiretorioFinal + '.zip';
         //Executa a separação de XML por pasta
         TThread.Synchronize(TThread.CurrentThread,
         procedure
@@ -186,7 +191,10 @@ begin
         end);
         CompactaArquivo(LoteXML, DiretorioFinal);
         RecursiveDelete(DiretorioFinal);
-        DisparaEmail(LoteXML);
+
+        if DisparaEmail = 'SIM' then
+          EnviaArquivo(LoteXML);
+
         Result := True;
       end
       else
@@ -336,6 +344,7 @@ begin
           SubItems.Add(Items[I].Split(['='])[3]);
           SubItems.Add(Items[I].Split(['='])[4]);
           SubItems.Add(Items[I].Split(['='])[5]);
+          SubItems.Add(Items[I].Split(['='])[6]);
         end;
       end;
     end;
@@ -545,7 +554,7 @@ begin
   end;
 end;
 
-procedure TFrmSeparadordeXML.DisparaEmail(Arquivo: String);
+procedure TFrmSeparadordeXML.EnviaArquivo(Arquivo: String);
 var
   Email: TEmail;
 begin
@@ -740,13 +749,18 @@ end;
 procedure TFrmSeparadordeXML.ManipulaGridProtocolo(Total: Boolean);
 var
   I: Integer;
-  Grupo, Cnpj, Protocolo: string;
+  Grupo, Cnpj, Protocolo, EnviaEmail: string;
   TotalRegistros: Boolean;
 begin
   if Total then
     TotalRegistros := True
   else
     TotalRegistros := CheckVerify.Checked;
+
+  if CheckEmail.Checked then
+    EnviaEmail := 'SIM'
+  else
+    EnviaEmail := 'NÃO';
 
   if (ListView1.ItemIndex >= 0) or (TotalRegistros) then
   begin
@@ -766,8 +780,9 @@ begin
               begin
                 with ListView1.Items[I] do
                 begin
-                  SubItems[3] := Protocolo;
+                  SubItems[3] := EnviaEmail;
                   SubItems[4] := 'CONSULTANDO';
+                  SubItems[5] := Protocolo;
                 end;
                 TotalUser := TotalUser  + 1;
               end);
@@ -960,9 +975,11 @@ begin
     if ListView1.Items[I].SubItems[4] = 'CONSULTANDO' then
     begin
       ParametroGrupo := ListView1.Items[I].Caption;
+      ParametroNome := ListView1.Items[I].SubItems[0];
       ParametroCnpj :=  ListView1.Items[I].SubItems[1];
       ParametroEmail :=  ListView1.Items[I].SubItems[2];
-      ProtocoloCliente := ListView1.Items[I].SubItems[3];
+      DisparaEmail :=  ListView1.Items[I].SubItems[3];
+      ProtocoloCliente := ListView1.Items[I].SubItems[5];
       if ConsultarProtocolo(ProtocoloCliente) then
       begin
         DataMod := DateTimeToStr(Now);
@@ -971,6 +988,7 @@ begin
         TThread.Synchronize(TThread.CurrentThread,
         procedure
         begin
+          ListView1.Items[I].SubItems[3] := 'SIM';
           ListView1.Items[I].SubItems[4] := DataMod;
         end);
       end;
