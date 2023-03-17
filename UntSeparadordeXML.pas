@@ -55,6 +55,7 @@ type
     function RecursiveDelete(FullPath: String): Boolean;
     function BuscaTomador: string;
     function BuscaEmitente: string;
+    function BuscaSerie(Chave: string): string;
     function CriarProtocolo(Grupo, Cnpj: String): string;
     function ConsultarProtocolo(Protocolo: String): Boolean;
     function VerificaDiretorioFinal(Diret: String): string;
@@ -246,6 +247,11 @@ begin
   emit := XMLDocument1.ChildNodes.FindNode('cteProc').ChildNodes.FindNode('CTe').ChildNodes.FindNode('infCte').ChildNodes.FindNode('emit');
   Result := emit.ChildNodes.FindNode('CNPJ').Text;
 //  Result := emit.ChildNodes.FindNode('xNome').Text +' - '+ emit.ChildNodes.FindNode('CNPJ').Text;
+end;
+
+function TFrmSeparadordeXML.BuscaSerie(Chave: string): string;
+begin
+  Result := Copy(Chave, 23, 3);
 end;
 
 function TFrmSeparadordeXML.BuscaTomador: string;
@@ -524,7 +530,7 @@ end;
 procedure TFrmSeparadordeXML.CTEs(DiretorioDase, DiretorioDestino,
   NomeArquivo: string);
 var
-Emitente, Tomador: string;
+Emitente, Tomador, Serie: string;
   cteProc: IXMLNode;
 begin
   cteProc := XMLDocument1.ChildNodes.FindNode('cteProc');
@@ -532,7 +538,8 @@ begin
   begin
     Emitente := TrocaCaracterEspecial(BuscaEmitente,True);  // busca o emitente do CTE
     Tomador := TrocaCaracterEspecial(BuscaTomador,True);    // Identifica qual é o tomador
-    MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\CTe Autorizado\'+Tomador))+'\'+NomeArquivo));
+    Serie := TrocaCaracterEspecial(BuscaSerie(cteProc.ChildNodes.FindNode('protCTe').ChildNodes.FindNode('infProt').ChildNodes.FindNode('chCTe').Text), True); // busca a série do CTE
+    MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\CT-E AUTORIZADO\SÉRIE '+Serie+'\'+Tomador))+'\'+NomeArquivo));
   end;
 end;
 
@@ -579,7 +586,7 @@ end;
 procedure TFrmSeparadordeXML.Eventos(DiretorioDase, DiretorioDestino, NomeArquivo: string );
 var
   F2: TSearchRec;
-  Emitente, TipoEvento: string;
+  Emitente, TipoEvento, Serie: string;
   procEventoCTe, infEvento: IXMLNode;
   Ret2: Integer;
 begin
@@ -589,24 +596,25 @@ begin
   begin
     infEvento := XMLDocument1.ChildNodes.FindNode('procEventoCTe').ChildNodes.FindNode('eventoCTe').ChildNodes.FindNode('infEvento');
     Emitente := infEvento.ChildNodes.FindNode('CNPJ').Text; // carrega o cnpj do tomador para usar como nome do diretório
+    Serie := TrocaCaracterEspecial(BuscaSerie(infEvento.ChildNodes.FindNode('chCTe').Text), True); // busca a série do CTE
 
     if infEvento.ChildNodes.FindNode('tpEvento').Text = '110110' then
     begin
-      TipoEvento := 'Carta de Correção';
+      TipoEvento := 'CARTA DE CORREÇÃO';
       // move o xml para o diretório do emitente
-      MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\Eventos\'+TipoEvento))+'\'+NomeArquivo));
+      MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\EVENTOS\SÉRIE '+Serie+'\'+TipoEvento))+'\'+NomeArquivo));
     end
     else
     if infEvento.ChildNodes.FindNode('tpEvento').Text = '110111' then
     begin
-      TipoEvento := 'Cancelamento';
+      TipoEvento := 'CANCELAMENTO';
       // move o xml para o diretório do emitente
-      MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\Eventos\'+TipoEvento))+'\'+NomeArquivo));
+      MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\EVENTOS\SÉRIE '+Serie+'\'+TipoEvento))+'\'+NomeArquivo));
 
-      // procura o xml do cte cancelado e move para o diret[orio correto
+      // procura o xml do cte cancelado e move para o diretorio correto
       Ret2 := FindFirst(DiretorioDase+'\'+infEvento.ChildNodes.FindNode('chCTe').Text+'-cte.xml', faAnyFile, F2);
       if Ret2 = 0 then
-        MoveFile(PChar(DiretorioDase+'\'+F2.Name),PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\CTe Cancelado\'))+F2.Name));
+        MoveFile(PChar(DiretorioDase+'\'+F2.Name),PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\CT-E CANCELADO\SÉRIE '+Serie+'\'))+F2.Name));
 
       FindClose(F2);
     end;
@@ -644,9 +652,8 @@ begin
         if FileExists(DiretorioTMP+'\'+F.Name) then
         begin
           XMLDocument1.LoadFromFile(DiretorioTMP+'\'+F.Name);// passa o diretório e o nome do arquivo para ser carregado no XMLDocument1 (carrega o xml no XMLDocument1)
-          Eventos(DiretorioTMP, DiretorioXML, F.Name);         // Resolve os xmls de eventos (cancelamento e carta de correcao) separando carta de correção e cancelamento
-          //Inutilizacao(DiretorioTMP, DiretorioXML, F.Name);     Resolve os xmls de Inutilização
-          CTEs(DiretorioTMP, DiretorioXML, F.Name);            // Resolve os xmls de CTE
+          Eventos(DiretorioTMP, DiretorioXML, F.Name);       // Resolve os xmls de eventos (cancelamento e carta de correcao) separando carta de correção e cancelamento
+          CTEs(DiretorioTMP, DiretorioXML, F.Name);          // Resolve os xmls de CTE
         end;
       end;
         Ret := FindNext(F);
@@ -655,6 +662,7 @@ begin
      FindClose(F);
    end;
 
+  // Resolve os xmls de Inutilização
   DiretorioInu := DiretorioTMP + '\Inutilizadas';
   if SysUtils.DirectoryExists(DiretorioInu) then
   begin
@@ -670,7 +678,7 @@ begin
         else
         begin
             XMLDocument1.LoadFromFile(DiretorioInu+'\'+F.Name);
-            Inutilizacao(DiretorioInu, DiretorioXML, F.Name);  // Resolve os xmls de Inutilização
+            Inutilizacao(DiretorioInu, DiretorioXML, F.Name);
         end;
           Ret := FindNext(F);
       end;
@@ -742,7 +750,7 @@ begin
     infEvento := XMLDocument1.ChildNodes.FindNode('procInutCTe').ChildNodes.FindNode('inutCTe').ChildNodes.FindNode('infInut');
     Emitente := infEvento.ChildNodes.FindNode('CNPJ').Text; // carrega o cnpj do tomador para usar como nome do diretório
     // move o xml para o diretório final
-    MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\Inutilização'))+'\'+NomeArquivo));
+    MoveFile(PChar(DiretorioDase+'\'+NomeArquivo), PChar((VerificaDiretorioFinal(DiretorioDestino+'\'+Emitente+'\INUTILIZAÇÃO'))+'\'+NomeArquivo));
   end;
 end;
 
