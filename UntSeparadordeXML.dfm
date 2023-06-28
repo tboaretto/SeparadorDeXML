@@ -150,6 +150,11 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
           Alignment = taCenter
           Caption = 'PROTOCOLO'
           Width = 220
+        end
+        item
+          Alignment = taCenter
+          Caption = 'SEPARAR LOTE'
+          Width = 90
         end>
       MultiSelect = True
       ReadOnly = True
@@ -167,9 +172,9 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
       OnClick = btnBaixarClick
     end
     object CheckVerify: TCheckBox
-      Left = 423
+      Left = 503
       Top = 399
-      Width = 97
+      Width = 83
       Height = 17
       Caption = ' Baixar Todos'
       TabOrder = 8
@@ -177,12 +182,22 @@ object FrmSeparadordeXML: TFrmSeparadordeXML
     object CheckEmail: TCheckBox
       Left = 320
       Top = 399
-      Width = 97
+      Width = 89
       Height = 17
       Caption = 'Disparar E-mail'
       Checked = True
       State = cbChecked
       TabOrder = 7
+    end
+    object CheckLote: TCheckBox
+      Left = 415
+      Top = 399
+      Width = 82
+      Height = 17
+      Caption = 'Separar Lote'
+      Checked = True
+      State = cbChecked
+      TabOrder = 11
     end
   end
   object XMLDocument1: TXMLDocument
